@@ -1,0 +1,1975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brand Strategy Agent</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+<style>
+  :root {
+    --ink: #1A1A17;
+    --charcoal: #2C2C28;
+    --muted: #7A776F;
+    --border: #DDD8D0;
+    --cream: #F7F3EE;
+    --warm: #E8DDD0;
+    --white: #FDFCFA;
+    --sage: #8A9E7B;
+    --sage-light: #C4D4B8;
+    --sage-pale: #EEF3EA;
+    --sage-dark: #526148;
+    --terra: #C4785A;
+    --terra-light: #F2E4DC;
+    --agent: #2C2C28;
+    --user-bg: #EEF3EA;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--charcoal);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; top: -160px; right: -160px;
+    width: 480px; height: 480px;
+    background: radial-gradient(circle, rgba(138,158,123,0.11) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed; bottom: -100px; left: -100px;
+    width: 380px; height: 380px;
+    background: radial-gradient(circle, rgba(196,120,90,0.08) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* ── Header ── */
+  header {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(247,243,238,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .logo-row {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .logo-leaf {
+    width: 30px; height: 30px;
+    background: var(--sage);
+    border-radius: 50% 50% 50% 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+  }
+  .logo-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px; font-weight: 400;
+    letter-spacing: 0.12em; color: var(--sage-dark);
+    text-transform: uppercase;
+  }
+  .logo-divider {
+    color: var(--border); margin: 0 6px;
+  }
+  .logo-sub {
+    font-size: 13px; color: var(--muted); font-weight: 300;
+  }
+
+  /* Phase pill row */
+  .phase-track {
+    display: flex; align-items: center; gap: 6px;
+  }
+  .phase-pill {
+    font-size: 11px; font-weight: 500;
+    padding: 4px 11px; border-radius: 999px;
+    border: 1px solid var(--border);
+    color: var(--muted); background: var(--white);
+    letter-spacing: 0.05em;
+    transition: all 0.25s;
+    white-space: nowrap;
+  }
+  .phase-pill.active {
+    background: var(--charcoal); border-color: var(--charcoal);
+    color: var(--cream);
+  }
+  .phase-pill.done {
+    background: var(--sage-pale); border-color: var(--sage-light);
+    color: var(--sage-dark);
+  }
+
+  /* ── Chat area ── */
+  .chat-wrap {
+    flex: 1;
+    max-width: 780px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 32px 24px 180px;
+    position: relative; z-index: 1;
+  }
+
+  .messages { display: flex; flex-direction: column; gap: 20px; }
+
+  .msg {
+    display: flex; gap: 12px;
+    animation: msgIn 0.28s ease forwards;
+    opacity: 0; transform: translateY(8px);
+  }
+  @keyframes msgIn { to { opacity: 1; transform: translateY(0); } }
+
+  .msg.agent { align-items: flex-start; }
+  .msg.user  { align-items: flex-start; flex-direction: row-reverse; }
+
+  .avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+  }
+  .avatar.agent-av {
+    background: var(--charcoal); color: var(--cream);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+  }
+  .avatar.user-av {
+    background: var(--sage-light); color: var(--sage-dark);
+  }
+
+  .bubble {
+    max-width: 78%;
+    padding: 14px 18px;
+    border-radius: 16px;
+    font-size: 14px; line-height: 1.72;
+    position: relative;
+  }
+  .msg.agent .bubble {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-top-left-radius: 4px;
+    color: var(--charcoal);
+  }
+  .msg.user .bubble {
+    background: var(--sage-pale);
+    border: 1px solid var(--sage-light);
+    border-top-right-radius: 4px;
+    color: var(--charcoal);
+  }
+
+  .bubble p { margin-bottom: 0.5em; }
+  .bubble p:last-child { margin-bottom: 0; }
+  .bubble strong { font-weight: 500; color: var(--ink); }
+  .bubble em { font-style: italic; color: var(--muted); }
+
+  /* Phase chip in agent messages */
+  .phase-chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 10px; font-weight: 500; letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: var(--warm); color: var(--muted);
+    padding: 3px 10px; border-radius: 999px;
+    margin-bottom: 10px;
+  }
+
+  /* Synthesis card */
+  .synthesis-card {
+    background: var(--sage-pale);
+    border: 1px solid var(--sage-light);
+    border-radius: 12px; padding: 14px 16px;
+    margin-top: 12px; font-size: 13px;
+    color: var(--sage-dark); line-height: 1.6;
+  }
+  .synthesis-card .syn-title {
+    font-size: 10px; font-weight: 500; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--sage);
+    margin-bottom: 8px;
+  }
+
+  /* Typing indicator */
+  .typing-bubble {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-top-left-radius: 4px;
+    border-radius: 16px;
+    padding: 14px 18px;
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .typing-bubble span {
+    width: 6px; height: 6px; background: var(--muted);
+    border-radius: 50%;
+    animation: blink 1.3s ease-in-out infinite;
+  }
+  .typing-bubble span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-bubble span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes blink { 0%,80%,100%{opacity:0.3;transform:scale(0.8)} 40%{opacity:1;transform:scale(1)} }
+
+  /* ── Deck generation card ── */
+  .deck-card {
+    background: var(--charcoal);
+    border-radius: 18px; padding: 28px;
+    color: var(--cream); margin-top: 8px;
+    animation: msgIn 0.28s ease forwards; opacity: 0;
+  }
+  .deck-card h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px; font-weight: 300;
+    margin-bottom: 8px;
+  }
+  .deck-card p {
+    font-size: 13px; color: rgba(247,243,238,0.65);
+    line-height: 1.6; margin-bottom: 20px;
+  }
+  .btn-deck {
+    background: var(--sage); color: #fff;
+    border: none; border-radius: 10px;
+    padding: 12px 24px; font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer; transition: background 0.2s;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-deck:hover { background: var(--sage-dark); }
+  .btn-deck:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .deck-progress {
+    margin-top: 14px; font-size: 13px;
+    color: rgba(247,243,238,0.7);
+    display: none;
+  }
+  .deck-progress.show { display: block; }
+
+  /* ── Input bar ── */
+  .input-wrap {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 16px 24px 20px;
+    background: linear-gradient(to top, var(--cream) 70%, transparent);
+  }
+  .input-inner {
+    max-width: 780px; margin: 0 auto;
+    display: flex; gap: 10px; align-items: flex-end;
+  }
+
+  /* Upload attachment preview strip */
+  .attachment-strip {
+    max-width: 780px; margin: 0 auto 8px;
+    display: none; gap: 8px; flex-wrap: wrap;
+  }
+  .attachment-strip.has-files { display: flex; }
+  .attachment-chip {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: 8px; padding: 5px 10px;
+    font-size: 12px; color: var(--charcoal);
+  }
+  .attachment-chip .chip-icon { font-size: 14px; }
+  .attachment-chip .chip-name { max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .attachment-chip .chip-remove {
+    cursor: pointer; color: var(--muted); font-size: 14px;
+    line-height: 1; margin-left: 2px;
+    background: none; border: none; padding: 0;
+  }
+  .attachment-chip .chip-remove:hover { color: var(--terracotta); }
+  .chip-img-preview {
+    width: 28px; height: 28px; border-radius: 4px;
+    object-fit: cover; flex-shrink: 0;
+  }
+
+  /* Attach button */
+  .btn-attach {
+    width: 48px; height: 48px; flex-shrink: 0;
+    background: var(--white); color: var(--muted);
+    border: 1px solid var(--border); border-radius: 12px;
+    cursor: pointer; font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .btn-attach:hover { border-color: var(--sage); color: var(--sage-dark); }
+  .input-field {
+    flex: 1;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px; color: var(--charcoal);
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 14px; padding: 12px 16px;
+    outline: none; resize: none;
+    min-height: 48px; max-height: 140px;
+    line-height: 1.5;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    overflow-y: auto;
+  }
+  .input-field:focus {
+    border-color: var(--sage);
+    box-shadow: 0 0 0 3px rgba(138,158,123,0.14);
+  }
+  .input-field::placeholder { color: var(--muted); }
+
+  .btn-send {
+    width: 48px; height: 48px; flex-shrink: 0;
+    background: var(--charcoal); color: var(--cream);
+    border: none; border-radius: 12px;
+    cursor: pointer; font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+  }
+  .btn-send:hover { background: var(--sage-dark); }
+  .btn-send:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-skip {
+    height: 48px; flex-shrink: 0;
+    padding: 0 16px;
+    background: transparent; color: var(--muted);
+    border: 1px solid var(--border); border-radius: 12px;
+    font-family: 'DM Sans', sans-serif; font-size: 13px;
+    cursor: pointer; transition: all 0.2s; white-space: nowrap;
+  }
+  .btn-skip:hover { border-color: var(--sage); color: var(--sage-dark); }
+  .btn-skip:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-mic {
+    width: 48px; height: 48px; flex-shrink: 0;
+    background: var(--white); color: var(--muted);
+    border: 1px solid var(--border); border-radius: 12px;
+    cursor: pointer; font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .btn-mic:hover { border-color: var(--sage); }
+  .btn-mic.recording {
+    background: var(--terracotta); border-color: var(--terracotta);
+    animation: micpulse 1s ease-in-out infinite;
+  }
+  @keyframes micpulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
+
+  /* Confetti canvas */
+  #confetti-canvas {
+    position: fixed; inset: 0; z-index: 9999;
+    pointer-events: none;
+  }
+
+  /* Resume banner */
+  .resume-banner {
+    background: var(--sage-pale); border: 1px solid var(--sage-light);
+    border-radius: 12px; padding: 14px 18px;
+    margin: 0 auto 20px; max-width: 600px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; font-size: 13px; color: var(--sage-dark);
+  }
+  .resume-banner strong { font-weight: 500; }
+  .resume-btn {
+    background: var(--sage); color: #fff;
+    border: none; border-radius: 8px; padding: 7px 16px;
+    font-family: 'DM Sans', sans-serif; font-size: 13px;
+    cursor: pointer; flex-shrink: 0;
+  }
+  .resume-discard {
+    background: none; border: none; color: var(--muted);
+    font-size: 12px; cursor: pointer; text-decoration: underline;
+    flex-shrink: 0;
+  }
+
+  /* API key modal */
+  #apikey-modal {
+    display: none; position: fixed; inset: 0; z-index: 300;
+    background: rgba(44,44,40,0.75); align-items: center; justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  #apikey-modal.visible { display: flex; }
+  .apikey-box {
+    background: var(--white); border-radius: 18px; padding: 36px;
+    max-width: 400px; width: 90%; box-shadow: 0 8px 60px rgba(44,44,40,0.2);
+  }
+  .apikey-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px; font-weight: 300; color: var(--charcoal); margin-bottom: 8px;
+  }
+  .apikey-sub { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 20px; }
+  .apikey-input {
+    width: 100%; font-family: 'DM Sans', sans-serif; font-size: 13px;
+    color: var(--charcoal); background: var(--cream);
+    border: 1px solid var(--border); border-radius: 9px;
+    padding: 10px 13px; outline: none; margin-bottom: 12px;
+    transition: border-color 0.2s;
+  }
+  .apikey-input:focus { border-color: var(--sage); }
+  .apikey-btn {
+    width: 100%; padding: 12px; background: var(--charcoal); color: var(--cream);
+    border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif;
+    font-size: 14px; cursor: pointer; transition: background 0.2s;
+  }
+  .apikey-btn:hover { background: var(--sage-dark); }
+  .apikey-hint { font-size: 11px; color: var(--muted); margin-top: 10px; line-height: 1.5; text-align: center; }
+
+  /* ── Responsive ── */
+  @media (max-width: 640px) {
+    .phase-track { display: none; }
+    .chat-wrap { padding: 20px 14px 160px; }
+    .bubble { max-width: 90%; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-row">
+    <div class="logo-leaf">🌿</div>
+    <span class="logo-name">Bloom</span>
+    <span class="logo-divider">·</span>
+    <span class="logo-sub">Brand Strategy Agent</span>
+  </div>
+  <div class="phase-track" id="phase-track">
+    <div class="phase-pill active" id="pp-0">Intake</div>
+    <div class="phase-pill" id="pp-1">Positioning</div>
+    <div class="phase-pill" id="pp-2">Audience</div>
+    <div class="phase-pill" id="pp-3">Brand Core</div>
+    <div class="phase-pill" id="pp-4">Differentiation</div>
+    <div class="phase-pill" id="pp-5">Visual</div>
+    <div class="phase-pill" id="pp-6">The Model</div>
+  </div>
+</header>
+
+<div class="chat-wrap">
+  <div class="messages" id="messages"></div>
+</div>
+
+<!-- API key modal -->
+<div id="apikey-modal">
+  <div class="apikey-box">
+    <div class="apikey-title">One thing before we start</div>
+    <div class="apikey-sub">This tool needs your Anthropic API key to run. It's stored only in your browser — never sent anywhere except directly to Anthropic.</div>
+    <input class="apikey-input" type="password" id="apikey-input" placeholder="sk-ant-api03-...">
+    <button class="apikey-btn" onclick="saveApiKey()">Let's go</button>
+    <div class="apikey-hint">Get your key at <strong>console.anthropic.com</strong> → API Keys. You only need to do this once per device.</div>
+  </div>
+</div>
+
+<canvas id="confetti-canvas"></canvas>
+
+<div class="input-wrap">
+  <div class="attachment-strip" id="attachment-strip"></div>
+  <div class="input-inner">
+    <button class="btn-attach" onclick="document.getElementById('file-input').click()" title="Attach image, audio, video or PDF">📎</button>
+    <input type="file" id="file-input" accept="image/*,audio/*,video/*,.pdf,.mp3,.mp4,.wav,.m4a" multiple style="display:none" onchange="handleFileAttach(this)">
+    <textarea class="input-field" id="input" placeholder="Type your answer here…" rows="1"></textarea>
+    <button class="btn-skip" id="skip-btn" onclick="skipQuestion()" title="Skip this question and come back later">Skip</button>
+    <button class="btn-mic" id="mic-btn" onclick="toggleMic()" title="Speak your answer">🎤</button>
+    <button class="btn-send" id="send-btn" onclick="sendMessage()">↑</button>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+const STORAGE_KEY = 'bloom_session_v1';
+const APIKEY_KEY  = 'bloom_apikey_v1';
+
+function getApiKey() {
+  try { return localStorage.getItem(APIKEY_KEY) || ''; }
+  catch(e) { return ''; } // localStorage blocked in iframe — fine, Claude.ai handles auth
+}
+function saveApiKey() {
+  const key = document.getElementById('apikey-input').value.trim();
+  if (!key.startsWith('sk-')) {
+    alert('That doesn\'t look right — your key should start with sk-ant-');
+    return;
+  }
+  localStorage.setItem(APIKEY_KEY, key);
+  document.getElementById('apikey-modal').classList.remove('visible');
+  startSession();
+}
+function checkApiKey() {
+  // Claude.ai preview runs in an iframe on claude.ai — skip the key modal there
+  const inClaudePreview = window.location.hostname.includes('claude.ai')
+    || window.self !== window.top;
+  if (inClaudePreview) return true;
+  if (!getApiKey()) {
+    document.getElementById('apikey-modal').classList.add('visible');
+    setTimeout(() => document.getElementById('apikey-input').focus(), 100);
+    return false;
+  }
+  return true;
+}
+
+const state = {
+  phase: 0,
+  history: [],
+  briefs: {},
+  brandName: '',
+  generating: false,
+  attachments: []
+};
+
+function saveSession() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      phase: state.phase,
+      history: state.history,
+      briefs: state.briefs,
+      brandName: state.brandName,
+    }));
+  } catch(e) {}
+}
+
+function loadSession() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+    if (saved && saved.history?.length > 2) return saved;
+  } catch(e) {}
+  return null;
+}
+
+function clearSession() {
+  localStorage.removeItem(STORAGE_KEY);
+}
+
+const PHASES = [
+  { id: 0, name: 'Intake',          label: 'Phase 0 · Intake' },
+  { id: 1, name: 'Positioning',     label: 'Phase 1 · Positioning' },
+  { id: 2, name: 'Audience',        label: 'Phase 2 · Audience' },
+  { id: 3, name: 'Brand Core',      label: 'Phase 3 · Brand Core' },
+  { id: 4, name: 'Differentiation', label: 'Phase 4 · Differentiation' },
+  { id: 5, name: 'Visual Direction',label: 'Phase 5 · Visual Direction' },
+  { id: 6, name: 'The Model',       label: 'Phase 6 · The Model' },
+];
+
+// ─────────────────────────────────────────────
+// SYSTEM PROMPT — Sam's voice, client-facing
+// ─────────────────────────────────────────────
+function buildSystemPrompt() {
+  return `You are Sam — a senior brand strategist. You're running a structured brand strategy session with a founder. You're warm, direct, and genuinely curious. No corporate speak, no jargon. One sharp question at a time. You listen, build on what's said, and move on when you have what you need.
+
+Sam is a woman. Use feminine voice naturally — not performatively, just as who you are.
+
+This is a direct conversation with the founder. Always use "you" and "your." Never say "the founder" or "the brand owner." It's "your story" not "the founder story." It's "your competitors" not "the competitive landscape."
+
+HOW SAM SOUNDS:
+- "Hi, I'm Sam." Not "Welcome to your brand strategy session."
+- Short sentences. Conversational. No padding.
+- "What's your story — how did this start?" not "Please describe your founding narrative."
+- "Got it. So the problem you're solving is X — why isn't anyone doing it properly?"
+- "That's a bit broad for me. Can you get more specific?"
+- "Let's move on — I've got enough on that. What I want to understand next is..."
+- Never say "Great answer!" or "Absolutely!" Just respond to what they said.
+- In Phase 3 (Brand Core), ALWAYS draft the content yourself first. Never ask the client to write their own mission, vision, values, or purpose from scratch. Use everything they've said to propose a draft, then ask if it resonates. "Here's a draft — does this feel right?" is the move, not "write me your mission statement."
+- If something's vague: "That's vague. Give me a concrete example."
+- Balance negative and positive probing. For every fear or frustration you explore, also ask about the aspiration or best case. Don't just mine for pain — find the dream too. 'What does success feel like for them?' is as important as 'what keeps them up at night?'
+- If something's contradictory: "You just said X, but earlier you said Y. Which is it?"
+
+SKIP LOGIC — CRITICAL:
+- If someone has gone back and forth on the same question 2+ times without resolution, proactively offer: "Do you want to skip this for now and come back to it at the end of this phase?"
+- If someone explicitly says "skip", "come back to this", "move on", "park it" — immediately acknowledge and move to the next question. Flag it as skipped in the synthesis so it gets revisited.
+- At the end of each phase synthesis, list any skipped questions and ask them again before advancing.
+- Never force someone to answer something they're stuck on. The momentum matters more.
+
+WEB SEARCH:
+When [SEARCH RESULT] blocks appear in the conversation, use that real data to ask sharper, more informed questions. Reference specific companies, trends, or pain points you find. Bring it in like someone who did their homework — not as a report-out, but woven into your next question.
+
+PHASES:
+0. Intake — What the business does, their story (how it started and why), who they're competing with (3–5 by name), what genuinely frustrates them about their industry
+1. Positioning — The core problem they solve, their unique take on it (the reframe), a draft positioning statement, where they sit on the market, a core term they could own
+2. Audience — 3 audience archetypes. IMPORTANT: an archetype is a psychographic profile — a type of person defined by mindset, values, fears and desires. NOT a job title or 'who would hire you.' Give each a vivid human name capturing their personality (e.g. 'The Burned Founder', 'The Visionary Who Can't Execute'). Describe them emotionally: what drives them, what keeps them up at night, what they desperately want and fear. Also: who you're NOT for, and what the audience most wants and dreads.
+3. Brand Core — Purpose, mission, vision, 4–5 values, personality, tone of voice. CRITICAL: Sam drafts these herself based on everything already discussed — she does NOT ask the client to write them. She says 'Based on what you've told me, here's a draft purpose: [X]. Does that land?' Then refines based on their reaction. Same for mission, vision, and values. Sam proposes, client reacts and adjusts. The client's job is to say yes, no, or tweak — not to write from scratch.
+4. Differentiation — Elevator pitch (2 sentences, no fluff), 3 us vs. them contrasts, messaging hierarchy
+5. Visual Direction — 3 feeling words, brand references they admire, typography personality. NEVER invent colours or fonts. If they upload an image, reference it directly.
+6. The Model — What they sell, how clients engage, hard guardrails, what success looks like in 12 months
+
+BEHAVIOR RULES:
+- Ask 1–2 questions per turn. Never a list of 5.
+- Build on what was said before asking the next thing.
+- Vague answer → name it, ask again. Contradiction → surface it.
+- When you have enough for a phase: brief synthesis, then move on.
+- NEVER fabricate brand information — only use what they tell you.
+- NEVER claim you can search when you can't — only reference search results when they appear in [SEARCH RESULT] blocks.
+- On phase transition, output: <SYNTHESIS phase="N">...json...</SYNTHESIS>
+- At the end of Phase 6, output: <READY_FOR_DECK/>
+
+SYNTHESIS JSON FORMAT:
+{
+  "phase": 0,
+  "name": "Intake",
+  "skipped": ["list any questions skipped this phase"],
+  "data": { /* phase-specific fields */ }
+}
+
+CURRENT PHASE: ${state.phase} — ${PHASES[state.phase]?.name}
+BRIEFS SO FAR: ${JSON.stringify(state.briefs, null, 2)}`;
+}
+
+// ─────────────────────────────────────────────
+// API CALL
+// ─────────────────────────────────────────────
+async function callClaude(userMessage, searchContext) {
+  // Build text content (with optional search context appended)
+  let textContent = userMessage;
+  if (searchContext) {
+    textContent += `\n\n[SEARCH RESULT — use this to ask more informed questions]\n${searchContext}`;
+  }
+
+  // Build message content — multi-part if images are attached
+  let content;
+  const imageAttachments = state.attachments.filter(a => a.type === 'image');
+  const otherAttachments = state.attachments.filter(a => a.type !== 'image');
+
+  if (imageAttachments.length > 0) {
+    // Claude can see images directly
+    content = imageAttachments.map(a => ({
+      type: 'image',
+      source: { type: 'base64', media_type: a.mediaType, data: a.data }
+    }));
+    // Describe non-image files in text since Claude can't process them directly
+    if (otherAttachments.length > 0) {
+      textContent += '\n\n[Also attached: ' + otherAttachments.map(a => `${a.name} (${a.fileType})`).join(', ') + ' — I can\'t view these directly but the client has shared them as reference material.]';
+    }
+    content.push({ type: 'text', text: textContent });
+  } else {
+    // No images — describe any other files in text
+    if (otherAttachments.length > 0) {
+      textContent += '\n\n[Attached reference files: ' + otherAttachments.map(a => `${a.name} (${a.fileType})`).join(', ') + '. The client has shared these as visual/audio reference material.]';
+    }
+    content = textContent;
+  }
+
+  state.history.push({ role: 'user', content });
+  state.attachments = []; // clear after sending
+  renderAttachmentStrip();
+
+  const body = {
+    model: 'claude-sonnet-4-20250514',
+    max_tokens: 1000,
+    system: buildSystemPrompt(),
+    messages: state.history
+  };
+
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': getApiKey(),
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify(body)
+  });
+
+  if (!res.ok) throw new Error(`API error ${res.status}`);
+  const data = await res.json();
+  const text = data.content?.map(b => b.text || '').join('') || '';
+  state.history.push({ role: 'assistant', content: text });
+  saveSession();
+  return text;
+}
+
+// ─────────────────────────────────────────────
+// PARSE AGENT RESPONSE
+// ─────────────────────────────────────────────
+function parseResponse(raw) {
+  // Extract synthesis blocks
+  const synthRegex = /<SYNTHESIS phase="(\d+)">([\s\S]*?)<\/SYNTHESIS>/g;
+  let match;
+  while ((match = synthRegex.exec(raw)) !== null) {
+    const phaseNum = parseInt(match[1]);
+    try {
+      const json = JSON.parse(match[2].trim());
+      state.briefs[phaseNum] = json;
+      if (phaseNum === 0 && json.data?.brand_name) {
+        state.brandName = json.data.brand_name;
+      }
+    } catch(e) { /* ignore parse errors */ }
+  }
+
+  // Check for deck ready signal
+  const deckReady = raw.includes('<READY_FOR_DECK/>');
+
+  // Clean display text
+  let display = raw
+    .replace(/<SYNTHESIS phase="\d+">([\s\S]*?)<\/SYNTHESIS>/g, '')
+    .replace(/<READY_FOR_DECK\/>/g, '')
+    .trim();
+
+  // Extract synthesis content for display card (last one found)
+  let synthDisplay = null;
+  const synthMatches = [...raw.matchAll(/<SYNTHESIS phase="(\d+)">([\s\S]*?)<\/SYNTHESIS>/g)];
+  if (synthMatches.length > 0) {
+    const last = synthMatches[synthMatches.length - 1];
+    try {
+      synthDisplay = JSON.parse(last[2].trim());
+    } catch(e) {}
+  }
+
+  // Detect phase advance (crude heuristic — agent announces next phase in text)
+  const phaseAdvanceMatch = display.match(/Phase (\d+)[^·]|moving (in)?to Phase (\d+)/i);
+  if (synthMatches.length > 0) {
+    const advancedTo = parseInt(synthMatches[synthMatches.length - 1][1]) + 1;
+    if (advancedTo <= 6 && advancedTo > state.phase) {
+      state.phase = advancedTo;
+      updatePhasePills();
+    }
+  }
+
+  return { display, synthDisplay, deckReady };
+}
+
+// ─────────────────────────────────────────────
+// UI HELPERS
+// ─────────────────────────────────────────────
+function updatePhasePills() {
+  PHASES.forEach((p, i) => {
+    const el = document.getElementById(`pp-${i}`);
+    if (!el) return;
+    el.classList.remove('active', 'done');
+    if (i < state.phase) el.classList.add('done');
+    if (i === state.phase) el.classList.add('active');
+  });
+}
+
+function escHtml(t) {
+  return (t || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function formatBubble(text) {
+  // Convert markdown-ish to HTML
+  let html = escHtml(text)
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/\n/g, '<br>');
+  return `<p>${html}</p>`;
+}
+
+function showTyping() {
+  const msgs = document.getElementById('messages');
+  const wrap = document.createElement('div');
+  wrap.className = 'msg agent';
+  wrap.id = 'typing-indicator';
+  wrap.innerHTML = `
+    <div class="avatar agent-av">B</div>
+    <div class="typing-bubble">
+      <span></span><span></span><span></span>
+    </div>`;
+  msgs.appendChild(wrap);
+  scrollBottom();
+}
+
+function hideTyping() {
+  const t = document.getElementById('typing-indicator');
+  if (t) t.remove();
+}
+
+function addAgentMessage(text, synthDisplay, deckReady) {
+  const msgs = document.getElementById('messages');
+  const wrap = document.createElement('div');
+  wrap.className = 'msg agent';
+
+  const phase = PHASES[state.phase];
+  let inner = `
+    <div class="avatar agent-av">B</div>
+    <div class="bubble">
+      <div class="phase-chip">✦ ${escHtml(phase?.label || '')}</div>
+      ${formatBubble(text)}`;
+
+  if (synthDisplay) {
+    inner += `
+      <div class="synthesis-card">
+        <div class="syn-title">Phase ${synthDisplay.phase} complete · ${escHtml(synthDisplay.name)}</div>
+        <div style="font-size:12px;opacity:0.75">Synthesis captured — moving to the next phase.</div>
+      </div>`;
+    // Fire confetti after a short delay so the card renders first
+    setTimeout(() => fireConfetti(), 200);
+  }
+
+  inner += `</div>`;
+  wrap.innerHTML = inner;
+  msgs.appendChild(wrap);
+
+  if (deckReady) {
+    addDeckCard();
+  }
+
+  scrollBottom();
+}
+
+function addUserMessage(text) {
+  const msgs = document.getElementById('messages');
+  const wrap = document.createElement('div');
+  wrap.className = 'msg user';
+  wrap.innerHTML = `
+    <div class="avatar user-av">You</div>
+    <div class="bubble">${formatBubble(text)}</div>`;
+  msgs.appendChild(wrap);
+  scrollBottom();
+}
+
+function addDeckCard() {
+  const msgs = document.getElementById('messages');
+  const wrap = document.createElement('div');
+  wrap.className = 'msg agent';
+  wrap.innerHTML = `
+    <div class="avatar agent-av">B</div>
+    <div style="flex:1">
+      <div class="deck-card" id="deck-card">
+        <h3>You're done. 🌿</h3>
+        <p>That's everything I need. Sam will review your session and put together your brand strategy deck — you'll hear from her soon.</p>
+        <button class="btn-deck" id="deck-btn" onclick="generateDeck()">✦ Finalise session</button>
+        <div class="deck-progress" id="deck-progress">Wrapping up…</div>
+      </div>
+    </div>`;
+  msgs.appendChild(wrap);
+  scrollBottom();
+}
+
+function scrollBottom() {
+  setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 60);
+}
+
+function setInputDisabled(val) {
+  document.getElementById('input').disabled = val;
+  document.getElementById('send-btn').disabled = val;
+}
+
+// ─────────────────────────────────────────────
+// SEND MESSAGE
+// ─────────────────────────────────────────────
+async function sendMessage() {
+  const input = document.getElementById('input');
+  const text = input.value.trim();
+  if (!text && !state.attachments.length || state.generating) return;
+  const displayText = text || 'Shared reference material';
+  const attachSuffix = attachmentSummaryText();
+  input.value = '';
+  input.style.height = 'auto';
+  await sendWithText(displayText + (attachSuffix ? '' : ''), displayText);
+}
+
+// ─────────────────────────────────────────────
+// AUTO-RESIZE TEXTAREA
+// ─────────────────────────────────────────────
+document.getElementById('input').addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 140) + 'px';
+});
+
+document.getElementById('input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
+
+// ─────────────────────────────────────────────
+// DECK GENERATION
+// ─────────────────────────────────────────────
+async function generateDeck() {
+  const btn = document.getElementById('deck-btn');
+  const prog = document.getElementById('deck-progress');
+  btn.disabled = true;
+  prog.classList.add('show');
+  prog.textContent = 'Assembling slides from your strategy briefs…';
+
+  try {
+    // Build the full brief for Claude to write slide content
+    const briefSummary = JSON.stringify(state.briefs, null, 2);
+
+    prog.textContent = 'Writing slide copy…';
+
+    const slideContent = await buildSlideContent(briefSummary);
+
+    prog.textContent = 'Rendering deck…';
+
+    await buildPptx(slideContent);
+
+    prog.textContent = '✓ All done — Sam will be in touch with your deck.';
+    btn.textContent = '✓ Complete';
+
+    // Ask Claude to write the full brand strategy as readable prose
+    const brandName = state.brandName || 'New client';
+    const transcript = state.history
+      .filter(m => typeof m.content === 'string')
+      .map(m => `[${m.role === 'assistant' ? 'SAM' : 'CLIENT'}]: ${m.content}`)
+      .join('\n\n');
+
+    let deckScript = '';
+    try {
+      const scriptRes = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': getApiKey(),
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          system: `You are a brand strategist writing up a complete brand strategy document from a session transcript. Write every section in clear, professional prose — no JSON, no code, no bullet points unless they genuinely serve the content. This document goes to the strategist (Sam) so she can build the client's deck. Write it as a working strategy document she can read straight through.`,
+          messages: [{
+            role: 'user',
+            content: `Based on this brand strategy session, write a complete brand strategy document covering every phase. Write in full prose — readable, professional, complete.
+
+SESSION TRANSCRIPT:
+${transcript}
+
+STRUCTURED BRIEFS:
+${JSON.stringify(state.briefs, null, 2)}
+
+Write the full document covering: the brand context and origin story, market positioning, audience archetypes, brand core (purpose/mission/vision/values/tone), differentiation and messaging, visual direction, and the business model. Include everything discussed. Flag anything that was skipped or needs follow-up.`
+          }]
+        })
+      });
+      const scriptData = await scriptRes.json();
+      deckScript = scriptData.content?.map(b => b.text || '').join('') || '';
+    } catch(e) {
+      // Fallback to structured transcript if Claude call fails
+      deckScript = transcript;
+    }
+
+    const date = new Date().toLocaleDateString('en-US', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+    const emailBody = `BRAND STRATEGY SESSION — ${brandName.toUpperCase()}
+${date}
+
+${deckScript}`;
+
+    sendSummaryEmail(brandName, emailBody);
+  } catch(e) {
+    prog.textContent = 'Error generating deck — ' + e.message;
+    btn.disabled = false;
+  }
+}
+
+async function buildSlideContent(briefSummary) {
+  const body = {
+    model: 'claude-sonnet-4-20250514',
+    max_tokens: 1000,
+    system: `You are a brand strategy deck writer. Given a complete set of brand strategy briefs, you produce structured slide content for a professional brand strategy deck. Return ONLY valid JSON — no markdown, no backticks.`,
+    messages: [{
+      role: 'user',
+      content: `Using these brand strategy briefs, write structured content for each slide section. 
+
+BRAND BRIEFS:
+${briefSummary}
+
+Return this exact JSON structure (fill every field — infer from briefs, never leave blank):
+{
+  "brand_name": "",
+  "tagline": "",
+  "cover_subtitle": "",
+  "context": {
+    "why_exists": "",
+    "market_problem": "",
+    "core_belief": ""
+  },
+  "positioning": {
+    "statement": "",
+    "elevator_pitch": "",
+    "five_words": "",
+    "core_term": ""
+  },
+  "audience": {
+    "archetype_1": { "name": "", "role": "", "context": "", "tension": "", "trigger": "" },
+    "archetype_2": { "name": "", "role": "", "context": "", "tension": "", "trigger": "" },
+    "archetype_3": { "name": "", "role": "", "context": "", "tension": "", "trigger": "" },
+    "not_for": ["", "", ""]
+  },
+  "brand_core": {
+    "purpose": "",
+    "mission": "",
+    "vision": "",
+    "values": [
+      { "name": "", "description": "" },
+      { "name": "", "description": "" },
+      { "name": "", "description": "" },
+      { "name": "", "description": "" }
+    ],
+    "personality_traits": ["", "", "", "", ""],
+    "voice_description": ""
+  },
+  "differentiation": {
+    "comparisons": [
+      { "them": "", "us": "" },
+      { "them": "", "us": "" },
+      { "them": "", "us": "" },
+      { "them": "", "us": "" },
+      { "them": "", "us": "" }
+    ],
+    "messaging": {
+      "tagline": "",
+      "brand_statement": "",
+      "elevator": "",
+      "proof_point": ""
+    }
+  },
+  "visual": {
+    "palette_description": "",
+    "primary_color_hex": "",
+    "secondary_color_hex": "",
+    "accent_color_hex": "",
+    "font_heading": "",
+    "font_body": "",
+    "mood_words": ["", "", "", ""]
+  },
+  "model": {
+    "services": ["", "", "", "", "", ""],
+    "engagement_steps": [
+      { "num": "01", "title": "", "desc": "" },
+      { "num": "02", "title": "", "desc": "" },
+      { "num": "03", "title": "", "desc": "" },
+      { "num": "04", "title": "", "desc": "" },
+      { "num": "05", "title": "", "desc": "" }
+    ],
+    "guardrails": ["", "", "", ""]
+  }
+}`
+    }]
+  };
+
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+
+  const data = await res.json();
+  const raw = data.content?.map(b => b.text || '').join('') || '{}';
+  try {
+    return JSON.parse(raw.replace(/```json|```/g, '').trim());
+  } catch(e) {
+    throw new Error('Could not parse slide content from AI');
+  }
+}
+
+// ─────────────────────────────────────────────
+// PPTX BUILDER
+// ─────────────────────────────────────────────
+async function buildPptx(d) {
+  const pres = new PptxGenJS();
+  pres.layout = 'LAYOUT_WIDE'; // 13.3" x 7.5"
+  pres.title = `${d.brand_name} — Brand Strategy`;
+
+  // Derive colors from visual direction (fallbacks to a rich charcoal/cream/sage palette)
+  const C = {
+    dark:    sanitizeHex(d.visual?.primary_color_hex)   || '1E1E1A',
+    mid:     sanitizeHex(d.visual?.secondary_color_hex) || '3D4A35',
+    accent:  sanitizeHex(d.visual?.accent_color_hex)    || 'C4785A',
+    cream:   'F7F3EE',
+    white:   'FDFCFA',
+    border:  'DDD8D0',
+    muted:   '7A776F',
+    sage:    '8A9E7B',
+  };
+
+  const F = {
+    head: d.visual?.font_heading || 'Garamond',
+    body: d.visual?.font_body    || 'Calibri',
+  };
+
+  const W = 13.3, H = 7.5;
+
+  // ── HELPERS ──
+  function sectionSlide(num, title) {
+    const s = pres.addSlide();
+    s.background = { color: C.dark };
+    // Left accent bar
+    s.addShape(pres.shapes.RECTANGLE, { x:0, y:0, w:0.32, h:H, fill:{ color: C.accent } });
+    // Section number
+    s.addText(num, { x:0.6, y:2.4, w:3, h:1.2, fontSize:72, fontFace:F.head, color:C.cream, bold:false, transparency:15 });
+    // Title
+    s.addText(title, { x:0.6, y:3.8, w:9, h:1, fontSize:28, fontFace:F.head, color:C.cream, bold:false });
+    // Subtitle line
+    s.addText('BRAND STRATEGY', { x:0.6, y:4.6, w:6, h:0.4, fontSize:11, fontFace:F.body, color:C.accent, charSpacing:5 });
+    return s;
+  }
+
+  function contentSlide(opts = {}) {
+    const s = pres.addSlide();
+    s.background = { color: opts.bg || C.white };
+    // Top accent strip
+    s.addShape(pres.shapes.RECTANGLE, { x:0, y:0, w:W, h:0.06, fill:{ color: C.accent } });
+    // Brand name watermark top-right
+    s.addText((d.brand_name || '').toUpperCase(), {
+      x: W-4.5, y:0.15, w:4.2, h:0.35,
+      fontSize:9, fontFace:F.body, color:C.muted,
+      align:'right', charSpacing:3
+    });
+    return s;
+  }
+
+  function addSectionHeader(slide, label) {
+    slide.addText(label, {
+      x:0.5, y:0.25, w:5, h:0.35,
+      fontSize:10, fontFace:F.body, color:C.muted,
+      charSpacing:4, bold:false
+    });
+  }
+
+  function addPageTitle(slide, title, y) {
+    slide.addText(title, {
+      x:0.5, y: y||0.65, w: W-1, h:0.75,
+      fontSize:30, fontFace:F.head, color:C.dark, bold:false
+    });
+  }
+
+  // ────────────────────────────
+  // SLIDE 1: COVER
+  // ────────────────────────────
+  {
+    const s = pres.addSlide();
+    s.background = { color: C.dark };
+    // Full-height left accent
+    s.addShape(pres.shapes.RECTANGLE, { x:0, y:0, w:0.32, h:H, fill:{ color: C.accent } });
+    // Big brand name
+    s.addText(d.brand_name || 'Your Brand', {
+      x:0.7, y:1.8, w:10, h:1.5,
+      fontSize:54, fontFace:F.head, color:C.cream,
+      bold:false, italic:false
+    });
+    // Tagline
+    if (d.tagline) {
+      s.addText(d.tagline, {
+        x:0.7, y:3.4, w:9, h:0.6,
+        fontSize:18, fontFace:F.head, color:C.cream,
+        italic:true, transparency:20
+      });
+    }
+    // Label
+    s.addText('BRAND STRATEGY  ·  ' + new Date().toLocaleDateString('en-US',{month:'long', year:'numeric'}).toUpperCase(), {
+      x:0.7, y:5.5, w:10, h:0.4,
+      fontSize:10, fontFace:F.body, color:C.accent,
+      charSpacing:4
+    });
+    s.addText('Working document — all content subject to revision.', {
+      x:0.7, y:6.1, w:8, h:0.4,
+      fontSize:10, fontFace:F.body, color:C.cream,
+      transparency:50
+    });
+  }
+
+  // ────────────────────────────
+  // SLIDE 2: TABLE OF CONTENTS
+  // ────────────────────────────
+  {
+    const s = contentSlide();
+    addSectionHeader(s, 'CONTENTS');
+    addPageTitle(s, "What's Inside", 0.65);
+
+    const sections = [
+      ['01', 'Context', 'Why we exist · What\'s broken'],
+      ['02', 'Positioning', 'The statement · The pitch · Core term'],
+      ['03', 'Audience', 'Archetypes · Psychographics · Who we\'re not for'],
+      ['04', 'Brand Core', 'Purpose · Mission · Vision · Values · Voice'],
+      ['05', 'Differentiation', 'Elevator pitch · Us vs. them · Messaging hierarchy'],
+      ['06', 'Visual Direction', 'Palette · Typography · Mood'],
+      ['07', 'The Model', 'Services · Engagement · Guardrails'],
+    ];
+
+    const colW = (W - 1.2) / 2;
+    sections.forEach((sec, i) => {
+      const col = i < 4 ? 0 : 1;
+      const row = i < 4 ? i : i - 4;
+      const x = 0.5 + col * (colW + 0.2);
+      const y = 1.7 + row * 1.1;
+
+      s.addShape(pres.shapes.RECTANGLE, { x, y, w:colW, h:0.95, fill:{ color:C.cream }, line:{ color:C.border, width:1 } });
+      s.addText(sec[0], { x:x+0.14, y:y+0.12, w:0.6, h:0.35, fontSize:11, fontFace:F.head, color:C.accent, bold:false });
+      s.addText(sec[1], { x:x+0.14, y:y+0.34, w:colW-0.3, h:0.3, fontSize:14, fontFace:F.head, color:C.dark, bold:false });
+      s.addText(sec[2], { x:x+0.14, y:y+0.6,  w:colW-0.3, h:0.28, fontSize:10, fontFace:F.body, color:C.muted });
+    });
+  }
+
+  // ────────────────────────────
+  // SECTION 01: CONTEXT
+  // ────────────────────────────
+  sectionSlide('01', 'Context');
+
+  // Why We Exist
+  {
+    const s = contentSlide();
+    addSectionHeader(s, 'CONTEXT · WHY WE EXIST');
+    addPageTitle(s, `Why ${d.brand_name} Exists`);
+
+    // Belief callout left
+    s.addShape(pres.shapes.RECTANGLE, { x:0.5, y:1.55, w:4.5, h:2.8, fill:{ color:C.dark } });
+    s.addText('OUR BELIEF', { x:0.72, y:1.75, w:4, h:0.3, fontSize:10, fontFace:F.body, color:C.accent, charSpacing:4 });
+    s.addText(d.context?.core_belief || '', {
+      x:0.72, y:2.15, w:4.1, h:2.0,
+      fontSize:16, fontFace:F.head, color:C.cream,
+      italic:true, valign:'top', lineSpacingMultiple:1.3
+    });
+
+    // Right column — reasons
+    const why = d.context?.why_exists || '';
+    s.addText(why, {
+      x:5.4, y:1.55, w:7.4, h:2.8,
+      fontSize:14, fontFace:F.body, color:C.dark,
+      valign:'top', lineSpacingMultiple:1.55
+    });
+  }
+
+  // Market Problem
+  {
+    const s = contentSlide({ bg: C.cream });
+    addSectionHeader(s, 'CONTEXT · THE MARKET PROBLEM');
+    addPageTitle(s, "What's Broken?");
+
+    s.addText(d.context?.market_problem || '', {
+      x:0.5, y:1.55, w:8, h:1.2,
+      fontSize:14, fontFace:F.body, color:C.dark,
+      lineSpacingMultiple:1.55
+    });
+
+    // Activity ≠ Progress callout
+    s.addShape(pres.shapes.RECTANGLE, { x:8.8, y:1.4, w:4.0, h:3.5, fill:{ color:C.accent } });
+    s.addText('Activity\n≠\nProgress.', {
+      x:8.8, y:1.8, w:4.0, h:3.0,
+      fontSize:36, fontFace:F.head, color:C.white,
+      align:'center', valign:'middle', lineSpacingMultiple:1.4
+    });
+  }
+
+  // ────────────────────────────
+  // SECTION 02: POSITIONING
+  // ────────────────────────────
+  sectionSlide('02', 'Positioning');
+
+  // Positioning Statement
+  {
+    const s = contentSlide();
+    addSectionHeader(s, 'POSITIONING · THE STATEMENT');
+    addPageTitle(s, 'Positioning Statement');
+
+    s.addShape(pres.shapes.RECTANGLE, { x:0.5, y:1.55, w:W-1, h:2.1, fill:{ color:C.cream }, line:{ color:C.border, width:1 } });
+    s.addText(d.positioning?.statement || '', {
+      x:0.85, y:1.75, w:W-1.8, h:1.8,
+      fontSize:20, fontFace:F.head, color:C.dark,
+      italic:true, valign:'middle', lineSpacingMultiple:1.4
+    });
+
+    s.addText('CORE TERM', { x:0.5, y:3.85, w:3, h:0.3, fontSize:10, fontFace:F.body, color:C.muted, charSpacing:4 });
+    s.addShape(pres.shapes.RECTANGLE, { x:0.5, y:4.18, w:5.5, h:0.7, fill:{ color:C.accent } });
+    s.addText(d.positioning?.core_term || '', {
+      x:0.65, y:4.18, w:5.2, h:0.7,
+      fontSize:18, fontFace:F.head, color:C.white,
+      valign:'middle'
+    });
+
+    s.addText('5 WORDS', { x:7, y:3.85, w:6, h:0.3, fontSize:10, fontFace:F.body, color:C.muted, charSpacing:4 });
+    s.addText(d.positioning?.five_words || '', {
+      x:7, y:4.18, w:5.8, h:0.7,
+      fontSize:18, fontFace:F.head, color:C.dark, italic:true,
+      valign:'middle'
+    });
+  }
+
+  // Elevator Pitch
+  {
+    const s = contentSlide({ bg: C.cream });
+    addSectionHeader(s, 'POSITIONING · ELEVATOR PITCH');
+    addPageTitle(s, 'The Pitch');
+
+    s.addShape(pres.shapes.RECTANGLE, { x:0.5, y:1.55, w:W-1, h:0.06, fill:{ color:C.accent } });
+    s.addText('WORKING PRIMARY', { x:0.5, y:1.75, w:4, h:0.3, fontSize:10, fontFace:F.body, color:C.muted, charSpacing:4 });
+    s.addText(d.positioning?.elevator_pitch || '', {
+      x:0.5, y:2.1, w:W-1.2, h:1.3,
+      fontSize:20, fontFace:F.head, color:C.dark,
+      italic:false, lineSpacingMultiple:1.4
+    });
+
+    s.addShape(pres.shapes.RECTANGLE, { x:0.5, y:3.6, w:W-1, h:0.01, fill:{ color:C.border } });
+    s.addText('IN A REAL CONVERSATION', { x:0.5, y:3.75, w:6, h:0.3, fontSize:10, fontFace:F.body, color:C.muted, charSpacing:4 });
+    // Reuse elevator pitch as real-convo version if no separate data
+    s.addText(d.differentiation?.messaging?.elevator || d.positioning?.elevator_pitch || '', {
+      x:0.5, y:4.1, w:W-1.2, h:1.5,
+      fontSize:14, fontFace:F.body, color:C.dark,
+      lineSpacingMultiple:1.55
+    });
+  }
+
+  // ────────────────────────────
+  // SECTION 03: AUDIENCE
+  // ────────────────────────────
+  sectionSlide('03', 'Audience');
+
+  // Three archetypes
+  {
+    const s = contentSlide();
+    addSectionHeader(s, 'AUDIENCE · CLIENT ARCHETYPES');
+    addPageTitle(s, 'Three Kinds of Clients We\'re Built For');
+
+    const archetypes = [
+      d.audience?.archetype_1,
+      d.audience?.archetype_2,
+      d.audience?.archetype_3,
+    ].filter(Boolean);
+
+    const cw = (W - 0.8) / 3;
+    archetypes.forEach((a, i) => {
+      const x = 0.4 + i * (cw + 0.1);
+      s.addShape(pres.shapes.RECTANGLE, { x, y:1.55, w:cw, h:5.4, fill:{ color: i === 1 ? C.dark : C.cream }, line:{ color:C.border, width:1 } });
+      s.addShape(pres.shapes.RECTANGLE, { x, y:1.55, w:cw, h:0.07, fill:{ color:C.accent } });
+
+      const tc = i === 1 ? C.cream : C.dark;
+      const tm = i === 1 ? 'E0D8CE' : C.muted;
+
+      s.addText((a.name || '').toUpperCase(), { x:x+0.16, y:1.72, w:cw-0.3, h:0.35, fontSize:11, fontFace:F.head, color:C.accent, charSpacing:2 });
+      s.addText(a.role || '', { x:x+0.16, y:2.05, w:cw-0.3, h:0.35, fontSize:9, fontFace:F.body, color:tm, charSpacing:2 });
+
+      s.addText('CONTEXT', { x:x+0.16, y:2.5, w:cw-0.3, h:0.25, fontSize:8, fontFace:F.body, color:C.accent, charSpacing:3 });
+      s.addText(a.context || '', { x:x+0.16, y:2.72, w:cw-0.3, h:1.0, fontSize:11, fontFace:F.body, color:tc, lineSpacingMultiple:1.4 });
+
+      s.addText('TENSION', { x:x+0.16, y:3.82, w:cw-0.3, h:0.25, fontSize:8, fontFace:F.body, color:C.accent, charSpacing:3 });
+      s.addText(a.tension || '', { x:x+0.16, y:4.04, w:cw-0.3, h:0.8, fontSize:11, fontFace:F.body, color:tc, lineSpacingMultiple:1.4, italic:true });
+
+      s.addText('TRIGGER', { x:x+0.16, y:4.94, w:cw-0.3, h:0.25, fontSize:8, fontFace:F.body, color:C.accent, charSpacing:3 });
+      s.addText(a.trigger || '', { x:x+0.16, y:5.16, w:cw-0.3, h:0.65, fontSize:11, fontFace:F.body, color:tc, lineSpacingMultiple:1.4 });
+    });
+  }
+
+  // Not for
+  {
+    const s = contentSlide({ bg: C.cream });
+    addSectionHeader(s, 'AUDIENCE · WHO WE\'RE NOT FOR');
+    addPageTitle(s, 'Not everyone is the right fit.\nThat\'s by design.');
+
+    const notFor = d.audience?.not_for || [];
+    const cw = (W - 0.8) / Math.max(notFor.length, 1);
+    notFor.forEach((item, i) => {
+      const x = 0.4 + i * (cw + 0.1);
+      const parts = item.split(' — ');
+      const heading = parts[0] || item;
+      const body = parts[1] || '';
+      s.addShape(pres.shapes.RECTANGLE, { x, y:1.9, w:cw - 0.1, h:3.8, fill:{ color:C.white }, line:{ color:C.border, width:1 } });
+      s.addText('✕', { x:x+0.2, y:2.1, w:0.4, h:0.4, fontSize:18, fontFace:F.body, color:C.accent });
+      s.addText(heading, { x:x+0.2, y:2.55, w:cw-0.5, h:0.4, fontSize:13, fontFace:F.head, color:C.dark, bold:false });
+      if (body) s.addText(body, { x:x+0.2, y:3.0, w:cw-0.5, h:2.5, fontSize:11, fontFace:F.body, color:C.muted, lineSpacingMultiple:1.5 });
+    });
+  }
+
+  // ────────────────────────────
+  // SECTION 04: BRAND CORE
+  // ────────────────────────────
+  sectionSlide('04', 'Brand Core');
+
+  // Purpose Mission Vision
+  {
+    const s = contentSlide();
+    addSectionHeader(s, 'BRAND CORE · PURPOSE · MISSION · VISION');
+
+    const pmv = [
+      { label:'PURPOSE', sub:'Why we exist long-term', text: d.brand_core?.purpose || '' },
+      { label:'MISSION', sub:'What we do every day', text: d.brand_core?.mission || '' },
+      { label:'VISION',  sub:'Where we\'re headed',   text: d.brand_core?.vision  || '' },
+    ];
+
+    pmv.forEach((item, i) => {
+      const y = 0.65 + i * 2.1;
+      s.addShape(pres.shapes.RECTANGLE, { x:0.5, y, w:0.06, h:1.5, fill:{ color:C.accent } });
+      s.addText(item.label, { x:0.72, y:y+0.05, w:3, h:0.28, fontSize:10, fontFace:F.body, color:C.accent, charSpacing:4 });
+      s.addText(item.sub,   { x:0.72, y:y+0.33, w:5, h:0.25, fontSize:10, fontFace:F.body, color:C.muted });
+      s.addText(item.text,  { x:0.72, y:y+0.6,  w:W-1.4, h:1.0, fontSize:14, fontFace:F.body, color:C.dark, lineSpacingMultiple:1.5 });
+    });
+  }
+
+  // Values
+  {
+    const s = contentSlide({ bg: C.cream });
+    addSectionHeader(s, 'BRAND CORE · VALUES');
+    addPageTitle(s, 'The Values That Drive Every Decision');
+
+    const values = (d.brand_core?.values || []).slice(0, 4);
+    const cw = (W - 0.8) / 2;
+    values.forEach((v, i) => {
+      const col = i % 2;
+      const row = Math.floor(i / 2);
+      const x = 0.4 + col * (cw + 0.1);
+      const y = 1.65 + row * 2.55;
+      s.addShape(pres.shapes.RECTANGLE, { x, y, w:cw - 0.1, h:2.35, fill:{ color:C.white }, line:{ color:C.border, width:1 } });
+      s.addShape(pres.shapes.RECTANGLE, { x, y, w:0.06, h:2.35, fill:{ color:C.accent } });
+      s.addText(v.name || '', { x:x+0.22, y:y+0.2, w:cw-0.5, h:0.4, fontSize:16, fontFace:F.head, color:C.dark, bold:false });
+      s.addText(v.description || '', { x:x+0.22, y:y+0.65, w:cw-0.5, h:1.5, fontSize:12, fontFace:F.body, color:C.muted, lineSpacingMultiple:1.5 });
+    });
+  }
+
+  // Voice
+  {
+    const s = contentSlide();
+    addSectionHeader(s, 'BRAND CORE · PERSONALITY + VOICE');
+    addPageTitle(s, 'How We Feel & How We Sound');
+
+    // Personality pills left
+    s.addText('PERSONALITY', { x:0.5, y:1.6, w:5, h:0.3, fontSize:10, fontFace:F.body, color:C.muted, charSpacing:4 });
+    const traits = d.brand_core?.personality_traits || [];
+    traits.slice(0, 6).forEach((t, i) => {
+      const row = Math.floor(i / 2);
+      const col = i % 2;
+      const x = 0.5 + col * 2.9;
+      const y = 2.0 + row * 0.6;
+      s.addShape(pres.shapes.RECTANGLE, { x, y, w:2.6, h:0.42, fill:{ color:C.cream }, line:{ color:C.border, width:1 } });
+      s.addText(t, { x:x+0.14, y, w:2.3, h:0.42, fontSize:13, fontFace:F.head, color:C.dark, valign:'middle' });
+    });
+
+    // Voice right
+    s.addShape(pres.shapes.RECTANGLE, { x:6.5, y:1.55, w:6.3, h:5.4, fill:{ color:C.dark } });
+    s.addText('TONE OF VOICE', { x:6.8, y:1.8, w:5.7, h:0.3, fontSize:10, fontFace:F.body, color:C.accent, charSpacing:4 });
+    s.addText(d.brand_core?.voice_description || '', {
+      x:6.8, y:2.2, w:5.7, h:4.5,
+      fontSize:14, fontFace:F.body, color:C.cream,
+      lineSpacingMultiple:1.6, valign:'top'
+    });
+  }
+
+  // ────────────────────────────
+  // SECTION 05: DIFFERENTIATION
+  // ────────────────────────────
+  sectionSlide('05', 'Differentiation');
+
+  // Us vs. them
+  {
+    const s = contentSlide({ bg: C.cream });
+    addSectionHeader(s, 'DIFFERENTIATION · US VS. THEM');
+    addPageTitle(s, 'How We\'re Actually Different');
+
+    // Column headers
+    s.addText('TYPICAL AGENCY', { x:0.5, y:1.65, w:6, h:0.35, fontSize:11, fontFace:F.body, color:C.muted, charSpacing:3 });
+    s.addText(`${(d.brand_name || '').toUpperCase()}`, { x:7.2, y:1.65, w:5.6, h:0.35, fontSize:11, fontFace:F.body, color:C.accent, charSpacing:3 });
+
+    const comps = (d.differentiation?.comparisons || []).slice(0, 5);
+    comps.forEach((c, i) => {
+      const y = 2.1 + i * 0.98;
+      const bg = i % 2 === 0 ? C.white : C.cream;
+      s.addShape(pres.shapes.RECTANGLE, { x:0.4, y, w:6.5, h:0.82, fill:{ color:bg }, line:{ color:C.border, width:1 } });
+      s.addShape(pres.shapes.RECTANGLE, { x:6.9, y, w:6.0, h:0.82, fill:{ color:C.dark } });
+      s.addShape(pres.shapes.RECTANGLE, { x:6.4, y: y+0.18, w:0.5, h:0.46, fill:{ color:C.accent } });
+      s.addText(c.them || '', { x:0.65, y, w:6.1, h:0.82, fontSize:12, fontFace:F.body, color:C.muted, valign:'middle' });
+      s.addText(c.us   || '', { x:7.1,  y, w:5.6, h:0.82, fontSize:12, fontFace:F.body, color:C.cream, valign:'middle' });
+    });
+  }
+
+  // Messaging hierarchy
+  {
+    const s = contentSlide();
+    addSectionHeader(s, 'DIFFERENTIATION · MESSAGING HIERARCHY');
+    addPageTitle(s, 'What to Say, When');
+
+    const levels = [
+      { num:'01', label:'TAGLINE',          text: d.differentiation?.messaging?.tagline || d.tagline || '' },
+      { num:'02', label:'BRAND STATEMENT',  text: d.differentiation?.messaging?.brand_statement || '' },
+      { num:'03', label:'ELEVATOR PITCH',   text: d.differentiation?.messaging?.elevator || '' },
+      { num:'04', label:'SERVICE PROOF POINT', text: d.differentiation?.messaging?.proof_point || '' },
+    ];
+
+    levels.forEach((lv, i) => {
+      const y = 1.55 + i * 1.3;
+      s.addShape(pres.shapes.RECTANGLE, { x:0.5, y, w:W-1, h:1.1, fill:{ color: i===0 ? C.dark : C.cream }, line:{ color:C.border, width:1 } });
+      const tc = i===0 ? C.cream : C.dark;
+      const tm = i===0 ? 'D0C8C0' : C.muted;
+      s.addText(lv.num, { x:0.7, y:y+0.1, w:0.6, h:0.35, fontSize:14, fontFace:F.head, color:C.accent });
+      s.addText(lv.label, { x:1.3, y:y+0.1, w:3.5, h:0.28, fontSize:9, fontFace:F.body, color:tm, charSpacing:3 });
+      s.addText(lv.text, { x:1.3, y:y+0.42, w:W-2.2, h:0.55, fontSize:13, fontFace:F.body, color:tc, lineSpacingMultiple:1.4 });
+    });
+  }
+
+  // ────────────────────────────
+  // SECTION 06: VISUAL DIRECTION
+  // ────────────────────────────
+  sectionSlide('06', 'Visual Direction');
+
+  {
+    const s = contentSlide({ bg: C.cream });
+    addSectionHeader(s, 'VISUAL DIRECTION');
+    addPageTitle(s, 'The Look & Feel');
+
+    const mood = d.visual?.mood_words || [];
+
+    // Palette swatches
+    s.addText('PALETTE', { x:0.5, y:1.6, w:4, h:0.28, fontSize:10, fontFace:F.body, color:C.muted, charSpacing:4 });
+    const swatches = [
+      { color: C.dark,   label:'Primary' },
+      { color: C.mid,    label:'Secondary' },
+      { color: C.accent, label:'Accent' },
+      { color: C.cream,  label:'Background' },
+    ];
+    swatches.forEach((sw, i) => {
+      const x = 0.5 + i * 1.65;
+      s.addShape(pres.shapes.RECTANGLE, { x, y:1.95, w:1.5, h:1.0, fill:{ color: sw.color }, line:{ color:C.border, width:1 } });
+      s.addText(sw.label, { x, y:3.02, w:1.5, h:0.28, fontSize:9, fontFace:F.body, color:C.muted, align:'center' });
+      s.addText('#' + sw.color, { x, y:3.28, w:1.5, h:0.25, fontSize:9, fontFace:F.body, color:C.muted, align:'center', transparency:30 });
+    });
+
+    // Palette description
+    s.addText(d.visual?.palette_description || '', {
+      x:0.5, y:3.65, w:7, h:0.9,
+      fontSize:13, fontFace:F.body, color:C.dark, lineSpacingMultiple:1.5
+    });
+
+    // Typography
+    s.addText('TYPOGRAPHY', { x:7.8, y:1.6, w:5, h:0.28, fontSize:10, fontFace:F.body, color:C.muted, charSpacing:4 });
+    s.addShape(pres.shapes.RECTANGLE, { x:7.8, y:1.95, w:5.0, h:1.4, fill:{ color:C.white }, line:{ color:C.border, width:1 } });
+    s.addText('Heading', { x:8.0, y:2.0, w:4.5, h:0.35, fontSize:11, fontFace:F.body, color:C.muted });
+    s.addText(F.head, { x:8.0, y:2.3, w:4.5, h:0.55, fontSize:22, fontFace:F.head, color:C.dark });
+    s.addText('Body', { x:8.0, y:2.85, w:4.5, h:0.25, fontSize:11, fontFace:F.body, color:C.muted });
+    s.addText(F.body, { x:8.0, y:3.06, w:4.5, h:0.4, fontSize:16, fontFace:F.body, color:C.dark });
+
+    // Mood tags
+    s.addText('MOOD', { x:7.8, y:3.65, w:5, h:0.28, fontSize:10, fontFace:F.body, color:C.muted, charSpacing:4 });
+    mood.forEach((m, i) => {
+      const x = 7.8 + (i % 2) * 2.55;
+      const y = 4.0 + Math.floor(i / 2) * 0.55;
+      s.addShape(pres.shapes.RECTANGLE, { x, y, w:2.35, h:0.38, fill:{ color:C.dark }, line:{ color:C.dark, width:0 } });
+      s.addText(m, { x, y, w:2.35, h:0.38, fontSize:12, fontFace:F.head, color:C.cream, align:'center', valign:'middle', italic:true });
+    });
+  }
+
+  // ────────────────────────────
+  // SECTION 07: THE MODEL
+  // ────────────────────────────
+  sectionSlide('07', 'The Model');
+
+  // Services
+  {
+    const s = contentSlide({ bg: C.cream });
+    addSectionHeader(s, 'THE MODEL · SERVICES + CAPABILITIES');
+    addPageTitle(s, 'Services & Capabilities');
+
+    const services = (d.model?.services || []).slice(0, 6);
+    const cols = 3;
+    const cw = (W - 0.8) / cols;
+
+    services.forEach((svc, i) => {
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      const x = 0.4 + col * (cw + 0.08);
+      const y = 1.65 + row * 2.4;
+      const parts = svc.split(' — ');
+      const heading = parts[0] || svc;
+      const body = parts[1] || '';
+      s.addShape(pres.shapes.RECTANGLE, { x, y, w:cw-0.08, h:2.2, fill:{ color:C.white }, line:{ color:C.border, width:1 } });
+      s.addShape(pres.shapes.RECTANGLE, { x, y, w:0.06, h:2.2, fill:{ color:C.accent } });
+      s.addText(heading, { x:x+0.22, y:y+0.18, w:cw-0.5, h:0.4, fontSize:14, fontFace:F.head, color:C.dark });
+      if (body) s.addText(body, { x:x+0.22, y:y+0.62, w:cw-0.5, h:1.4, fontSize:11, fontFace:F.body, color:C.muted, lineSpacingMultiple:1.5 });
+    });
+  }
+
+  // Engagement model
+  {
+    const s = contentSlide();
+    addSectionHeader(s, 'THE MODEL · HOW WE WORK TOGETHER');
+    addPageTitle(s, 'How We Work Together');
+
+    const steps = (d.model?.engagement_steps || []).slice(0, 5);
+    const sw = (W - 0.8) / steps.length;
+
+    steps.forEach((st, i) => {
+      const x = 0.4 + i * (sw + 0.04);
+      s.addShape(pres.shapes.RECTANGLE, { x, y:1.6, w:sw-0.04, h:5.0, fill:{ color: i===2 ? C.dark : C.cream }, line:{ color:C.border, width:1 } });
+      const tc = i===2 ? C.cream : C.dark;
+      const tm = i===2 ? 'D0C8C0' : C.muted;
+
+      s.addText(st.num || String(i+1).padStart(2,'0'), {
+        x:x+0.15, y:1.8, w:sw-0.3, h:0.7,
+        fontSize:28, fontFace:F.head, color:C.accent
+      });
+      s.addText(st.title || '', {
+        x:x+0.15, y:2.55, w:sw-0.3, h:0.5,
+        fontSize:14, fontFace:F.head, color:tc, bold:false
+      });
+      s.addText(st.desc || '', {
+        x:x+0.15, y:3.1, w:sw-0.3, h:3.2,
+        fontSize:11, fontFace:F.body, color:tm, lineSpacingMultiple:1.5, valign:'top'
+      });
+    });
+  }
+
+  // Guardrails
+  {
+    const s = contentSlide({ bg: C.cream });
+    addSectionHeader(s, 'THE MODEL · STRATEGIC GUARDRAILS');
+    addPageTitle(s, 'Strategic Guardrails');
+    s.addText('The things we protect — in how we work and who we become.', {
+      x:0.5, y:1.4, w:W-1, h:0.4,
+      fontSize:14, fontFace:F.body, color:C.muted, italic:true
+    });
+
+    const guards = (d.model?.guardrails || []).slice(0, 4);
+    const cw = (W - 0.8) / 2;
+    guards.forEach((g, i) => {
+      const col = i % 2;
+      const row = Math.floor(i / 2);
+      const x = 0.4 + col * (cw + 0.1);
+      const y = 1.9 + row * 2.6;
+      const parts = g.split('. ');
+      const head = parts[0] || g;
+      const body = parts.slice(1).join('. ');
+      s.addShape(pres.shapes.RECTANGLE, { x, y, w:cw-0.1, h:2.35, fill:{ color:C.white }, line:{ color:C.border, width:1 } });
+      s.addShape(pres.shapes.RECTANGLE, { x, y, w:cw-0.1, h:0.07, fill:{ color:C.accent } });
+      s.addText(head, { x:x+0.2, y:y+0.2, w:cw-0.5, h:0.5, fontSize:14, fontFace:F.head, color:C.dark });
+      if (body) s.addText(body, { x:x+0.2, y:y+0.75, w:cw-0.5, h:1.4, fontSize:12, fontFace:F.body, color:C.muted, lineSpacingMultiple:1.5 });
+    });
+  }
+
+  // ────────────────────────────
+  // FINAL SLIDE: WHAT'S STILL OPEN
+  // ────────────────────────────
+  {
+    const s = pres.addSlide();
+    s.background = { color: C.dark };
+    s.addShape(pres.shapes.RECTANGLE, { x:0, y:0, w:0.32, h:H, fill:{ color: C.accent } });
+
+    s.addText('WHAT\'S STILL OPEN', { x:0.6, y:0.8, w:10, h:0.4, fontSize:11, fontFace:F.body, color:C.accent, charSpacing:5 });
+    s.addText('Strong foundation.\nNothing finished.\nThat\'s the point — keep working it.', {
+      x:0.6, y:1.4, w:8, h:2.2,
+      fontSize:30, fontFace:F.head, color:C.cream,
+      lineSpacingMultiple:1.35, valign:'top'
+    });
+
+    s.addText('This is a working document.\nAll content subject to revision.', {
+      x:0.6, y:5.5, w:8, h:0.9,
+      fontSize:12, fontFace:F.body, color:C.cream, transparency:45,
+      lineSpacingMultiple:1.6
+    });
+
+    const mo = new Date().toLocaleDateString('en-US',{month:'long', year:'numeric'});
+    s.addText(mo.toUpperCase(), { x:0.6, y:6.5, w:6, h:0.4, fontSize:10, fontFace:F.body, color:C.accent, charSpacing:4 });
+  }
+
+  // ── WRITE FILE ──
+  const fileName = `${(d.brand_name || 'brand').toLowerCase().replace(/\s+/g,'-')}-brand-strategy.pptx`;
+  await pres.writeFile({ fileName });
+}
+
+function sanitizeHex(hex) {
+  if (!hex) return null;
+  return hex.replace(/[^0-9A-Fa-f]/g, '').slice(0, 6) || null;
+}
+
+// ─────────────────────────────────────────────
+// INIT — kick off conversation
+// ─────────────────────────────────────────────
+async function init() {
+  setInputDisabled(true);
+  showTyping();
+
+  try {
+    const raw = await callClaude("Start the session. Introduce yourself as Sam in one line. Ask one question: what their brand is and how it started. Two or three sentences total. Sound human, not like a form.");
+    hideTyping();
+    const { display, synthDisplay, deckReady } = parseResponse(raw);
+    addAgentMessage(display, synthDisplay, deckReady);
+  } catch(e) {
+    hideTyping();
+    addAgentMessage("Hi, I'm Sam.\n\nI'm going to walk you through a full brand strategy session — we'll work through your positioning, audience, values, messaging, and more. At the end you'll have a complete strategy deck.\n\nLet's start: what's your brand, and what's the story behind it?", null, false);
+  }
+
+  setInputDisabled(false);
+  document.getElementById('input').focus();
+}
+
+// ─────────────────────────────────────────────
+// CONFETTI — dopamine hit on phase complete
+// ─────────────────────────────────────────────
+function fireConfetti() {
+  const canvas = document.getElementById('confetti-canvas');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const ctx = canvas.getContext('2d');
+  const colours = ['#8A9E7B','#C4785A','#526148','#C4D4B8','#E8DDD0','#F7F3EE','#2C2C28'];
+  const pieces = Array.from({length:130}, () => ({
+    x: Math.random() * canvas.width,
+    y: -10 - Math.random() * 140,
+    w: 6 + Math.random() * 8, h: 4 + Math.random() * 5,
+    colour: colours[Math.floor(Math.random()*colours.length)],
+    rot: Math.random() * Math.PI * 2,
+    vx: (Math.random()-0.5)*3, vy: 2+Math.random()*4,
+    vr: (Math.random()-0.5)*0.2,
+  }));
+  let frame = 0;
+  function draw() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    pieces.forEach(p => {
+      p.x+=p.vx; p.y+=p.vy; p.vy+=0.06; p.rot+=p.vr;
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, 1-frame/85);
+      ctx.translate(p.x,p.y); ctx.rotate(p.rot);
+      ctx.fillStyle=p.colour;
+      ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+      ctx.restore();
+    });
+    frame++;
+    if(frame<95) requestAnimationFrame(draw);
+    else ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+  draw();
+}
+
+// ─────────────────────────────────────────────
+// SKIP QUESTION
+// ─────────────────────────────────────────────
+async function skipQuestion() {
+  const input = document.getElementById('input');
+  input.value = '';
+  await sendWithText("Let's skip this for now and come back to it at the end of this phase.");
+}
+
+async function sendWithText(text) {
+  addUserMessage(text);
+  setInputDisabled(true);
+  state.generating = true;
+  let searchContext = null;
+  try {
+    if (shouldSearch(text)) {
+      showSearchIndicator();
+      searchContext = await searchForContext(text).catch(()=>null);
+      hideSearchIndicator();
+    }
+  } catch(e) { hideSearchIndicator(); }
+  showTyping();
+  try {
+    const raw = await callClaude(text, searchContext);
+    hideTyping();
+    const {display, synthDisplay, deckReady} = parseResponse(raw);
+    addAgentMessage(display, synthDisplay, deckReady);
+  } catch(e) {
+    hideTyping();
+    addAgentMessage(`Error: ${e.message}. Run this from https:// not file://`, null, false);
+  }
+  state.generating = false;
+  setInputDisabled(false);
+  document.getElementById('input').focus();
+}
+
+// ─────────────────────────────────────────────
+// SESSION RESTORE
+// ─────────────────────────────────────────────
+function showResumeBanner(saved) {
+  const msgs = document.getElementById('messages');
+  const banner = document.createElement('div');
+  banner.className = 'resume-banner';
+  const phaseName = PHASES[saved.phase]?.name || 'previous session';
+  banner.innerHTML = `
+    <div><strong>You left off in Phase ${saved.phase} · ${phaseName}.</strong> Pick up where you were?</div>
+    <button class="resume-btn" onclick="resumeSession()">Resume</button>
+    <button class="resume-discard" onclick="discardSession()">Start fresh</button>`;
+  msgs.appendChild(banner);
+  window._savedSession = saved;
+}
+
+function resumeSession() {
+  const saved = window._savedSession;
+  if (!saved) return;
+  state.phase = saved.phase;
+  state.history = saved.history;
+  state.briefs = saved.briefs;
+  state.brandName = saved.brandName || '';
+  updatePhasePills();
+  document.querySelector('.resume-banner')?.remove();
+  // Replay conversation into UI
+  state.history.forEach(msg => {
+    const text = typeof msg.content === 'string'
+      ? msg.content
+      : msg.content?.find?.(b=>b.type==='text')?.text || '';
+    if (!text) return;
+    if (msg.role === 'user') addUserMessage(text);
+    else { const {display, synthDisplay} = parseResponse(text); addAgentMessage(display, synthDisplay, false); }
+  });
+  scrollBottom();
+}
+
+function discardSession() {
+  clearSession();
+  document.querySelector('.resume-banner')?.remove();
+  init();
+}
+
+// ─────────────────────────────────────────────
+// WEB SEARCH — real Claude web_search tool
+// ─────────────────────────────────────────────
+function shouldSearch(text) {
+  return /\b(like|similar to|compared to|competing with|competitor|vs\.?|rival|have you heard of|do you know)\b/i.test(text)
+    || (/\b[A-Z][a-zA-Z]+(?: [A-Z][a-zA-Z]+)?\b/.test(text) && text.length > 20);
+}
+
+async function searchForContext(text) {
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': getApiKey(),
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 500,
+        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+        system: 'Research assistant. Search for any brand, company, or industry mentioned. Return a concise 3–4 sentence factual summary: what they do, positioning, target audience, anything notable. Plain text only.',
+        messages: [{ role: 'user', content: `Brand strategy session context: "${text.slice(0,300)}"\n\nSearch for specific brands or companies mentioned and summarise.` }]
+      })
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const result = data.content?.filter(b=>b.type==='text').map(b=>b.text).join('') || '';
+    return result.length > 40 ? result : null;
+  } catch(e) { return null; }
+}
+
+function showSearchIndicator() {
+  const msgs = document.getElementById('messages');
+  const el = document.createElement('div');
+  el.id = 'search-ind';
+  el.style.cssText = 'display:flex;align-items:center;gap:8px;font-size:12px;color:#7A776F;padding:4px 0 10px 52px;';
+  el.innerHTML = '<span style="width:6px;height:6px;background:#C4785A;border-radius:50%;animation:sdp 1.2s ease-in-out infinite;display:inline-block"></span>Searching...';
+  if (!document.getElementById('search-anim')) {
+    const s = document.createElement('style'); s.id='search-anim';
+    s.textContent='@keyframes sdp{0%,100%{opacity:0.3}50%{opacity:1}}';
+    document.head.appendChild(s);
+  }
+  msgs.appendChild(el); scrollBottom();
+}
+function hideSearchIndicator() { document.getElementById('search-ind')?.remove(); }
+
+// ─────────────────────────────────────────────
+// MAILTO EMAIL
+// ─────────────────────────────────────────────
+const YOUR_EMAIL = 'sbellisf@gmail.com';
+function sendSummaryEmail(brandName, briefSummary) {
+  const subject = encodeURIComponent(`Brand strategy session — ${brandName}`);
+  const body = encodeURIComponent(briefSummary);
+  window.open(`mailto:${YOUR_EMAIL}?subject=${subject}&body=${body}`);
+}
+
+// ─────────────────────────────────────────────
+// FILE ATTACHMENTS
+// ─────────────────────────────────────────────
+function getFileIcon(t) {
+  if(t.startsWith('image/')) return '🖼️';
+  if(t.startsWith('audio/')) return '🎵';
+  if(t.startsWith('video/')) return '🎬';
+  if(t==='application/pdf') return '📄';
+  return '📎';
+}
+function handleFileAttach(input) {
+  Array.from(input.files).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const [,data] = e.target.result.split(',');
+      const isImage = file.type.startsWith('image/');
+      state.attachments.push({ name:file.name, fileType:file.type, mediaType:file.type,
+        type: isImage?'image':'other', data: isImage?data:null, preview: isImage?e.target.result:null });
+      renderAttachmentStrip();
+    };
+    reader.readAsDataURL(file);
+  });
+  input.value='';
+}
+function renderAttachmentStrip() {
+  const strip = document.getElementById('attachment-strip');
+  strip.innerHTML='';
+  if(!state.attachments.length){strip.classList.remove('has-files');return;}
+  strip.classList.add('has-files');
+  state.attachments.forEach((a,i)=>{
+    const chip=document.createElement('div'); chip.className='attachment-chip';
+    const prev=a.preview?`<img src="${a.preview}" class="chip-img-preview">`:`<span class="chip-icon">${getFileIcon(a.fileType)}</span>`;
+    chip.innerHTML=`${prev}<span class="chip-name">${a.name}</span><button class="chip-remove" onclick="removeAttachment(${i})">×</button>`;
+    strip.appendChild(chip);
+  });
+}
+function removeAttachment(i){state.attachments.splice(i,1);renderAttachmentStrip();}
+function attachmentSummaryText(){
+  if(!state.attachments.length)return'';
+  const imgs=state.attachments.filter(a=>a.type==='image').length;
+  const other=state.attachments.filter(a=>a.type!=='image');
+  const parts=[];
+  if(imgs)parts.push(`${imgs} image${imgs>1?'s':''}`);
+  other.forEach(a=>parts.push(a.name));
+  return parts.length?` [+ ${parts.join(', ')}]`:'';
+}
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+async function init() {
+  if (!checkApiKey()) return; // shows modal if no key
+  startSession();
+}
+
+async function startSession() {
+  // Check for saved session first
+  const saved = loadSession();
+  if (saved) {
+    showResumeBanner(saved);
+    setInputDisabled(false);
+    document.getElementById('input').focus();
+    return;
+  }
+
+  setInputDisabled(true);
+  showTyping();
+  try {
+    const raw = await callClaude("Greet them as Sam. Say exactly: Hi, I'm Sam 👋 I'll be running your brand strategy session today. Then on a new line say: Let's start simple: what's your brand, and how did it start? Do not add anything else.");
+    hideTyping();
+    const {display, synthDisplay, deckReady} = parseResponse(raw);
+    addAgentMessage(display, synthDisplay, deckReady);
+  } catch(e) {
+    hideTyping();
+    addAgentMessage("Hi, I'm Sam 👋\n\nI'll be running your brand strategy session today.\n\nLet's start simple: what's your brand, and how did it start?", null, false);
+  }
+  setInputDisabled(false);
+  document.getElementById('input').focus();
+}
+
+// ─────────────────────────────────────────────
+// MICROPHONE — speech to text
+// ─────────────────────────────────────────────
+let recognition = null;
+let isRecording = false;
+
+function toggleMic() {
+  if (isRecording) stopMic(); else startMic();
+}
+
+function startMic() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { alert('Voice input isn\'t supported in this browser. Try Chrome.'); return; }
+  recognition = new SR();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
+  const input = document.getElementById('input');
+  const btn = document.getElementById('mic-btn');
+  let finalTranscript = input.value;
+
+  recognition.onstart = () => {
+    isRecording = true;
+    btn.classList.add('recording');
+    if (!finalTranscript) input.placeholder = 'Listening…';
+  };
+  recognition.onresult = (e) => {
+    let interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const t = e.results[i][0].transcript;
+      if (e.results[i].isFinal) finalTranscript += t + ' ';
+      else interim = t;
+    }
+    input.value = finalTranscript + interim;
+    autoResize(input);
+  };
+  recognition.onerror = (e) => { if (e.error !== 'no-speech') stopMic(); };
+  recognition.onend = () => { input.value = input.value.trim(); stopMic(); };
+  recognition.start();
+}
+
+function stopMic() {
+  isRecording = false;
+  document.getElementById('mic-btn').classList.remove('recording');
+  document.getElementById('input').placeholder = 'Type your answer here…';
+  if (recognition) { recognition.stop(); recognition = null; }
+}
+
+init();
+</script>
+</body>
+</html>
