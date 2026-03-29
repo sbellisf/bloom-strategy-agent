@@ -254,17 +254,6 @@
   .resume-btn { background: var(--sage); color: #fff; border: none; border-radius: 8px; padding: 7px 16px; font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; flex-shrink: 0; }
   .resume-discard { background: none; border: none; color: var(--muted); font-size: 12px; cursor: pointer; text-decoration: underline; flex-shrink: 0; }
 
-  #apikey-modal { display: none; position: fixed; inset: 0; z-index: 300; background: rgba(44,44,40,0.75); align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-  #apikey-modal.visible { display: flex; }
-  .apikey-box { background: var(--white); border-radius: 18px; padding: 36px; max-width: 400px; width: 90%; box-shadow: 0 8px 60px rgba(44,44,40,0.2); }
-  .apikey-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 300; color: var(--charcoal); margin-bottom: 8px; }
-  .apikey-sub { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 20px; }
-  .apikey-input { width: 100%; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--charcoal); background: var(--cream); border: 1px solid var(--border); border-radius: 9px; padding: 10px 13px; outline: none; margin-bottom: 12px; transition: border-color 0.2s; }
-  .apikey-input:focus { border-color: var(--sage); }
-  .apikey-btn { width: 100%; padding: 12px; background: var(--charcoal); color: var(--cream); border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; cursor: pointer; transition: background 0.2s; }
-  .apikey-btn:hover { background: var(--sage-dark); }
-  .apikey-hint { font-size: 11px; color: var(--muted); margin-top: 10px; line-height: 1.5; text-align: center; }
-
   @media (max-width: 640px) {
     .phase-track { display: none; }
     .chat-wrap { padding: 20px 14px 160px; }
@@ -296,16 +285,6 @@
   <div class="messages" id="messages"></div>
 </div>
 
-<div id="apikey-modal">
-  <div class="apikey-box">
-    <div class="apikey-title">One thing before we start</div>
-    <div class="apikey-sub">This tool needs your Anthropic API key to run. It's stored only in your browser — never sent anywhere except directly to Anthropic.</div>
-    <input class="apikey-input" type="password" id="apikey-input" placeholder="sk-ant-api03-...">
-    <button class="apikey-btn" onclick="saveApiKey()">Let's go</button>
-    <div class="apikey-hint">Get your key at <strong>console.anthropic.com</strong> → API Keys. You only need to do this once per device.</div>
-  </div>
-</div>
-
 <canvas id="confetti-canvas"></canvas>
 
 <div class="input-wrap">
@@ -322,24 +301,6 @@
 
 <script>
 const STORAGE_KEY = 'bloom_session_v1';
-const APIKEY_KEY  = 'bloom_apikey_v1';
-
-function getApiKey() {
-  try { return localStorage.getItem(APIKEY_KEY) || ''; } catch(e) { return ''; }
-}
-function saveApiKey() {
-  const key = document.getElementById('apikey-input').value.trim();
-  if (!key.startsWith('sk-')) { alert('That doesn\'t look right — your key should start with sk-ant-'); return; }
-  localStorage.setItem(APIKEY_KEY, key);
-  document.getElementById('apikey-modal').classList.remove('visible');
-  startSession();
-}
-function checkApiKey() {
-  const inClaudePreview = window.location.hostname.includes('claude.ai') || window.self !== window.top;
-  if (inClaudePreview) return true;
-  if (false) { document.getElementById('apikey-modal').classList.add('visible'); setTimeout(() => document.getElementById('apikey-input').focus(), 100); return false; }
-  return true;
-}
 
 const state = { phase: 0, history: [], briefs: {}, brandName: '', generating: false, attachments: [] };
 
@@ -367,34 +328,25 @@ function buildSystemPrompt() {
 
 Sam is a woman. Use feminine voice naturally — not performatively, just as who you are.
 
-This is a direct conversation with the founder. Always use "you" and "your." Never say "the founder" or "the brand owner." It's "your story" not "the founder story." It's "your competitors" not "the competitive landscape."
+This is a direct conversation with the founder. Always use "you" and "your." Never say "the founder" or "the brand owner."
 
 HOW SAM SOUNDS:
-- "Hi, I'm Sam." Not "Welcome to your brand strategy session."
 - Short sentences. Conversational. No padding.
-- "What's your story — how did this start?" not "Please describe your founding narrative."
-- "Got it. So the problem you're solving is X — why isn't anyone doing it properly?"
-- "That's a bit broad for me. Can you get more specific?"
-- "Let's move on — I've got enough on that. What I want to understand next is..."
 - Never say "Great answer!" or "Absolutely!" Just respond to what they said.
-- In Phase 3 (Brand Core), ALWAYS draft the content yourself first. Never ask the client to write their own mission, vision, values, or purpose from scratch. Use everything they've said to propose a draft, then ask if it resonates. "Here's a draft — does this feel right?" is the move, not "write me your mission statement."
+- In Phase 3 (Brand Core), ALWAYS draft the content yourself first. Never ask the client to write their own mission, vision, values, or purpose from scratch.
 - If something's vague: "That's vague. Give me a concrete example."
-- Balance negative and positive probing. For every fear or frustration you explore, also ask about the aspiration or best case.
+- Balance negative and positive probing.
 - If something's contradictory: "You just said X, but earlier you said Y. Which is it?"
 
-SKIP LOGIC — CRITICAL:
-- If someone has gone back and forth on the same question 2+ times without resolution, proactively offer to skip.
-- If someone explicitly says "skip", "come back to this", "move on", "park it" — immediately acknowledge and move to the next question.
-- At the end of each phase synthesis, list any skipped questions and ask them again before advancing.
-
-WEB SEARCH:
-When [SEARCH RESULT] blocks appear in the conversation, use that real data to ask sharper, more informed questions.
+SKIP LOGIC:
+- If someone explicitly says "skip", "come back to this", "move on" — immediately move to the next question.
+- At the end of each phase synthesis, list any skipped questions.
 
 PHASES:
-0. Intake — What the business does, their story, who they're competing with (3–5 by name), what genuinely frustrates them about their industry
-1. Positioning — The core problem they solve, their unique take on it, a draft positioning statement, where they sit on the market, a core term they could own
+0. Intake — What the business does, their story, who they're competing with (3–5 by name), what frustrates them about their industry
+1. Positioning — The core problem they solve, their unique take, a draft positioning statement, a core term they could own
 2. Audience — 3 audience archetypes (psychographic profiles, not job titles). Give each a vivid human name. Also: who you're NOT for.
-3. Brand Core — Purpose, mission, vision, 4–5 values, personality, tone of voice. Sam drafts these herself based on everything already discussed — she does NOT ask the client to write them.
+3. Brand Core — Purpose, mission, vision, 4–5 values, personality, tone of voice. Sam drafts these herself — she does NOT ask the client to write them.
 4. Differentiation — Elevator pitch (2 sentences), 3 us vs. them contrasts, messaging hierarchy
 5. Visual Direction — 3 feeling words, brand references they admire, typography personality. NEVER invent colours or fonts.
 6. The Model — What they sell, how clients engage, hard guardrails, what success looks like in 12 months
@@ -402,9 +354,8 @@ PHASES:
 BEHAVIOR RULES:
 - Ask 1–2 questions per turn. Never a list of 5.
 - Build on what was said before asking the next thing.
-- Vague answer → name it, ask again. Contradiction → surface it.
 - When you have enough for a phase: brief synthesis, then move on.
-- NEVER fabricate brand information — only use what they tell you.
+- NEVER fabricate brand information.
 - On phase transition, output: <SYNTHESIS phase="N">...json...</SYNTHESIS>
 - At the end of Phase 6, output: <READY_FOR_DECK/>
 
@@ -412,8 +363,8 @@ SYNTHESIS JSON FORMAT:
 {
   "phase": 0,
   "name": "Intake",
-  "skipped": ["list any questions skipped this phase"],
-  "data": { /* phase-specific fields */ }
+  "skipped": [],
+  "data": {}
 }
 
 CURRENT PHASE: ${state.phase} — ${PHASES[state.phase]?.name}
@@ -422,7 +373,7 @@ BRIEFS SO FAR: ${JSON.stringify(state.briefs, null, 2)}`;
 
 async function callClaude(userMessage, searchContext) {
   let textContent = userMessage;
-  if (searchContext) textContent += `\n\n[SEARCH RESULT — use this to ask more informed questions]\n${searchContext}`;
+  if (searchContext) textContent += `\n\n[SEARCH RESULT]\n${searchContext}`;
 
   let content;
   const imageAttachments = state.attachments.filter(a => a.type === 'image');
@@ -430,10 +381,9 @@ async function callClaude(userMessage, searchContext) {
 
   if (imageAttachments.length > 0) {
     content = imageAttachments.map(a => ({ type: 'image', source: { type: 'base64', media_type: a.mediaType, data: a.data } }));
-    if (otherAttachments.length > 0) textContent += '\n\n[Also attached: ' + otherAttachments.map(a => `${a.name} (${a.fileType})`).join(', ') + ']';
+    if (otherAttachments.length > 0) textContent += '\n\n[Also attached: ' + otherAttachments.map(a => a.name).join(', ') + ']';
     content.push({ type: 'text', text: textContent });
   } else {
-    if (otherAttachments.length > 0) textContent += '\n\n[Attached reference files: ' + otherAttachments.map(a => `${a.name} (${a.fileType})`).join(', ') + ']';
     content = textContent;
   }
 
@@ -443,7 +393,7 @@ async function callClaude(userMessage, searchContext) {
 
   const res = await fetch('/.netlify/functions/chat', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-api-key': getApiKey(), 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, system: buildSystemPrompt(), messages: state.history })
   });
 
@@ -474,9 +424,6 @@ function parseResponse(raw) {
   const synthMatches = [...raw.matchAll(/<SYNTHESIS phase="(\d+)">([\s\S]*?)<\/SYNTHESIS>/g)];
   if (synthMatches.length > 0) {
     try { synthDisplay = JSON.parse(synthMatches[synthMatches.length - 1][2].trim()); } catch(e) {}
-  }
-
-  if (synthMatches.length > 0) {
     const advancedTo = parseInt(synthMatches[synthMatches.length - 1][1]) + 1;
     if (advancedTo <= 6 && advancedTo > state.phase) { state.phase = advancedTo; updatePhasePills(); }
   }
@@ -579,11 +526,11 @@ async function generateDeck() {
     try {
       const scriptRes = await fetch('/.netlify/functions/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-api-key': getApiKey(), 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514', max_tokens: 1000,
-          system: 'You are a brand strategist writing up a complete brand strategy document from a session transcript. Write every section in clear, professional prose — no JSON, no code, no bullet points unless they genuinely serve the content.',
-          messages: [{ role: 'user', content: `Write a complete brand strategy document from this session.\n\nTRANSCRIPT:\n${transcript}\n\nBRIEFS:\n${JSON.stringify(state.briefs, null, 2)}\n\nCover: context and origin, positioning, audience archetypes, brand core, differentiation, visual direction, business model. Flag anything skipped or needing follow-up.` }]
+          system: 'You are a brand strategist writing up a complete brand strategy document from a session transcript. Write in clear professional prose.',
+          messages: [{ role: 'user', content: `Write a complete brand strategy document from this session.\n\nTRANSCRIPT:\n${transcript}\n\nBRIEFS:\n${JSON.stringify(state.briefs, null, 2)}\n\nCover all phases. Flag anything skipped or needing follow-up.` }]
         })
       });
       const scriptData = await scriptRes.json();
@@ -592,22 +539,23 @@ async function generateDeck() {
 
     const date = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-    await fetch('https://api.resend.com/emails', {
+    // Send email via Netlify function — key never exposed in client code
+    await fetch('/.netlify/functions/chat', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer re_P8vEHPFn_J5w2ujnJVoe1w3UZ8WB2QSkD' },
-      body: JSON.stringify({
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ resend: {
         from: 'Bloom <onboarding@resend.dev>',
         to: ['sbellisf@gmail.com'],
         subject: `Brand strategy session — ${brandName} · ${date}`,
         html: `<p style="font-family:sans-serif;font-size:14px;color:#2C2C28;"><strong>${brandName}</strong> just completed their brand strategy session.<br><br>Deck attached. Notes below.<br><br><hr style="border:none;border-top:1px solid #DDD8D0;margin:16px 0;"><pre style="font-family:sans-serif;font-size:13px;color:#3A3A36;white-space:pre-wrap;line-height:1.7;">${deckScript}</pre><hr style="border:none;border-top:1px solid #DDD8D0;margin:16px 0;"><span style="font-size:11px;color:#7A776F;">Bloom · Brand Strategy Agent · KYD Studios</span></p>`,
         attachments: [{ filename: fileName, content: base64 }]
-      })
+      }})
     });
 
     prog.textContent = '✓ Session complete — Sam will be in touch.';
     btn.textContent = '✓ Complete';
   } catch(e) {
-    prog.textContent = 'Error generating deck — ' + e.message;
+    prog.textContent = 'Error — ' + e.message;
     btn.disabled = false;
   }
 }
@@ -618,13 +566,13 @@ async function buildSlideContent(briefSummary) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: 'claude-sonnet-4-20250514', max_tokens: 1000,
-      system: 'You are a brand strategy deck writer. Given brand strategy briefs, produce structured slide content. Return ONLY valid JSON — no markdown, no backticks.',
-      messages: [{ role: 'user', content: `Using these brand strategy briefs, write structured content for each slide section.\n\nBRAND BRIEFS:\n${briefSummary}\n\nReturn this exact JSON structure (fill every field):\n{\n  "brand_name": "",\n  "tagline": "",\n  "cover_subtitle": "",\n  "context": { "why_exists": "", "market_problem": "", "core_belief": "" },\n  "positioning": { "statement": "", "elevator_pitch": "", "five_words": "", "core_term": "" },\n  "audience": {\n    "archetype_1": { "name": "", "role": "", "context": "", "tension": "", "trigger": "" },\n    "archetype_2": { "name": "", "role": "", "context": "", "tension": "", "trigger": "" },\n    "archetype_3": { "name": "", "role": "", "context": "", "tension": "", "trigger": "" },\n    "not_for": ["", "", ""]\n  },\n  "brand_core": {\n    "purpose": "", "mission": "", "vision": "",\n    "values": [{ "name": "", "description": "" }, { "name": "", "description": "" }, { "name": "", "description": "" }, { "name": "", "description": "" }],\n    "personality_traits": ["", "", "", "", ""],\n    "voice_description": ""\n  },\n  "differentiation": {\n    "comparisons": [{ "them": "", "us": "" }, { "them": "", "us": "" }, { "them": "", "us": "" }, { "them": "", "us": "" }, { "them": "", "us": "" }],\n    "messaging": { "tagline": "", "brand_statement": "", "elevator": "", "proof_point": "" }\n  },\n  "visual": { "palette_description": "", "primary_color_hex": "", "secondary_color_hex": "", "accent_color_hex": "", "font_heading": "", "font_body": "", "mood_words": ["", "", "", ""] },\n  "model": {\n    "services": ["", "", "", "", "", ""],\n    "engagement_steps": [{ "num": "01", "title": "", "desc": "" }, { "num": "02", "title": "", "desc": "" }, { "num": "03", "title": "", "desc": "" }, { "num": "04", "title": "", "desc": "" }, { "num": "05", "title": "", "desc": "" }],\n    "guardrails": ["", "", "", ""]\n  }\n}` }]
+      system: 'You are a brand strategy deck writer. Return ONLY valid JSON — no markdown, no backticks.',
+      messages: [{ role: 'user', content: `Write structured slide content from these briefs.\n\nBRIEFS:\n${briefSummary}\n\nReturn this exact JSON:\n{\n  "brand_name": "",\n  "tagline": "",\n  "cover_subtitle": "",\n  "context": { "why_exists": "", "market_problem": "", "core_belief": "" },\n  "positioning": { "statement": "", "elevator_pitch": "", "five_words": "", "core_term": "" },\n  "audience": {\n    "archetype_1": { "name": "", "role": "", "context": "", "tension": "", "trigger": "" },\n    "archetype_2": { "name": "", "role": "", "context": "", "tension": "", "trigger": "" },\n    "archetype_3": { "name": "", "role": "", "context": "", "tension": "", "trigger": "" },\n    "not_for": ["", "", ""]\n  },\n  "brand_core": {\n    "purpose": "", "mission": "", "vision": "",\n    "values": [{ "name": "", "description": "" }, { "name": "", "description": "" }, { "name": "", "description": "" }, { "name": "", "description": "" }],\n    "personality_traits": ["", "", "", "", ""],\n    "voice_description": ""\n  },\n  "differentiation": {\n    "comparisons": [{ "them": "", "us": "" }, { "them": "", "us": "" }, { "them": "", "us": "" }, { "them": "", "us": "" }, { "them": "", "us": "" }],\n    "messaging": { "tagline": "", "brand_statement": "", "elevator": "", "proof_point": "" }\n  },\n  "visual": { "palette_description": "", "primary_color_hex": "", "secondary_color_hex": "", "accent_color_hex": "", "font_heading": "", "font_body": "", "mood_words": ["", "", "", ""] },\n  "model": {\n    "services": ["", "", "", "", "", ""],\n    "engagement_steps": [{ "num": "01", "title": "", "desc": "" }, { "num": "02", "title": "", "desc": "" }, { "num": "03", "title": "", "desc": "" }, { "num": "04", "title": "", "desc": "" }, { "num": "05", "title": "", "desc": "" }],\n    "guardrails": ["", "", "", ""]\n  }\n}` }]
     })
   });
   const data = await res.json();
   const raw = data.content?.map(b => b.text || '').join('') || '{}';
-  try { return JSON.parse(raw.replace(/```json|```/g, '').trim()); } catch(e) { throw new Error('Could not parse slide content from AI'); }
+  try { return JSON.parse(raw.replace(/```json|```/g, '').trim()); } catch(e) { throw new Error('Could not parse slide content'); }
 }
 
 async function buildPptx(d) {
@@ -645,8 +593,8 @@ async function buildPptx(d) {
     const s = pres.addSlide();
     s.background = { color: C.dark };
     s.addShape(pres.shapes.RECTANGLE, { x:0, y:0, w:0.32, h:H, fill:{ color: C.accent } });
-    s.addText(num,   { x:0.6, y:2.4, w:3, h:1.2, fontSize:72, fontFace:F.head, color:C.cream, bold:false, transparency:15 });
-    s.addText(title, { x:0.6, y:3.8, w:9, h:1,   fontSize:28, fontFace:F.head, color:C.cream, bold:false });
+    s.addText(num,   { x:0.6, y:2.4, w:3,  h:1.2, fontSize:72, fontFace:F.head, color:C.cream, bold:false, transparency:15 });
+    s.addText(title, { x:0.6, y:3.8, w:9,  h:1,   fontSize:28, fontFace:F.head, color:C.cream, bold:false });
     s.addText('BRAND STRATEGY', { x:0.6, y:4.6, w:6, h:0.4, fontSize:11, fontFace:F.body, color:C.accent, charSpacing:5 });
     return s;
   }
@@ -676,10 +624,10 @@ async function buildPptx(d) {
     const sections = [['01','Context','Why we exist · What\'s broken'],['02','Positioning','The statement · The pitch · Core term'],['03','Audience','Archetypes · Psychographics · Who we\'re not for'],['04','Brand Core','Purpose · Mission · Vision · Values · Voice'],['05','Differentiation','Elevator pitch · Us vs. them · Messaging hierarchy'],['06','Visual Direction','Palette · Typography · Mood'],['07','The Model','Services · Engagement · Guardrails']];
     const colW = (W-1.2)/2;
     sections.forEach((sec,i) => {
-      const col = i<4?0:1, row = i<4?i:i-4, x = 0.5+col*(colW+0.2), y = 1.7+row*1.1;
+      const col=i<4?0:1, row=i<4?i:i-4, x=0.5+col*(colW+0.2), y=1.7+row*1.1;
       s.addShape(pres.shapes.RECTANGLE, { x, y, w:colW, h:0.95, fill:{ color:C.cream }, line:{ color:C.border, width:1 } });
-      s.addText(sec[0], { x:x+0.14, y:y+0.12, w:0.6, h:0.35, fontSize:11, fontFace:F.head, color:C.accent, bold:false });
-      s.addText(sec[1], { x:x+0.14, y:y+0.34, w:colW-0.3, h:0.3, fontSize:14, fontFace:F.head, color:C.dark, bold:false });
+      s.addText(sec[0], { x:x+0.14, y:y+0.12, w:0.6,      h:0.35, fontSize:11, fontFace:F.head, color:C.accent, bold:false });
+      s.addText(sec[1], { x:x+0.14, y:y+0.34, w:colW-0.3, h:0.3,  fontSize:14, fontFace:F.head, color:C.dark,   bold:false });
       s.addText(sec[2], { x:x+0.14, y:y+0.6,  w:colW-0.3, h:0.28, fontSize:10, fontFace:F.body, color:C.muted });
     });
   }
@@ -721,10 +669,9 @@ async function buildPptx(d) {
     const archetypes = [d.audience?.archetype_1, d.audience?.archetype_2, d.audience?.archetype_3].filter(Boolean);
     const cw = (W-0.8)/3;
     archetypes.forEach((a,i) => {
-      const x = 0.4+i*(cw+0.1);
-      s.addShape(pres.shapes.RECTANGLE, { x, y:1.55, w:cw, h:5.4, fill:{ color: i===1?C.dark:C.cream }, line:{ color:C.border, width:1 } });
+      const x=0.4+i*(cw+0.1), tc=i===1?C.cream:C.dark, tm=i===1?'E0D8CE':C.muted;
+      s.addShape(pres.shapes.RECTANGLE, { x, y:1.55, w:cw, h:5.4, fill:{ color:i===1?C.dark:C.cream }, line:{ color:C.border, width:1 } });
       s.addShape(pres.shapes.RECTANGLE, { x, y:1.55, w:cw, h:0.07, fill:{ color:C.accent } });
-      const tc = i===1?C.cream:C.dark, tm = i===1?'E0D8CE':C.muted;
       s.addText((a.name||'').toUpperCase(), { x:x+0.16, y:1.72, w:cw-0.3, h:0.35, fontSize:11, fontFace:F.head, color:C.accent, charSpacing:2 });
       s.addText(a.role||'',    { x:x+0.16, y:2.05, w:cw-0.3, h:0.35, fontSize:9,  fontFace:F.body, color:tm, charSpacing:2 });
       s.addText('CONTEXT',     { x:x+0.16, y:2.5,  w:cw-0.3, h:0.25, fontSize:8,  fontFace:F.body, color:C.accent, charSpacing:3 });
@@ -736,9 +683,9 @@ async function buildPptx(d) {
     });
   }
   { const s = contentSlide({ bg:C.cream }); addSectionHeader(s,"AUDIENCE · WHO WE'RE NOT FOR"); addPageTitle(s,'Not everyone is the right fit.\nThat\'s by design.');
-    const notFor = d.audience?.not_for||[], cw = (W-0.8)/Math.max(notFor.length,1);
+    const notFor=d.audience?.not_for||[], cw=(W-0.8)/Math.max(notFor.length,1);
     notFor.forEach((item,i) => {
-      const x = 0.4+i*(cw+0.1), parts = item.split(' — '), heading = parts[0]||item, body = parts[1]||'';
+      const x=0.4+i*(cw+0.1), parts=item.split(' — '), heading=parts[0]||item, body=parts[1]||'';
       s.addShape(pres.shapes.RECTANGLE, { x, y:1.9, w:cw-0.1, h:3.8, fill:{ color:C.white }, line:{ color:C.border, width:1 } });
       s.addText('✕', { x:x+0.2, y:2.1, w:0.4, h:0.4, fontSize:18, fontFace:F.body, color:C.accent });
       s.addText(heading, { x:x+0.2, y:2.55, w:cw-0.5, h:0.4, fontSize:13, fontFace:F.head, color:C.dark, bold:false });
@@ -749,21 +696,21 @@ async function buildPptx(d) {
   sectionSlide('04','Brand Core');
   { const s = contentSlide(); addSectionHeader(s,'BRAND CORE · PURPOSE · MISSION · VISION');
     [{ label:'PURPOSE', sub:'Why we exist long-term', text:d.brand_core?.purpose||'' },{ label:'MISSION', sub:'What we do every day', text:d.brand_core?.mission||'' },{ label:'VISION', sub:"Where we're headed", text:d.brand_core?.vision||'' }].forEach((item,i) => {
-      const y = 0.65+i*2.1;
+      const y=0.65+i*2.1;
       s.addShape(pres.shapes.RECTANGLE, { x:0.5, y, w:0.06, h:1.5, fill:{ color:C.accent } });
-      s.addText(item.label, { x:0.72, y:y+0.05, w:3, h:0.28, fontSize:10, fontFace:F.body, color:C.accent, charSpacing:4 });
-      s.addText(item.sub,   { x:0.72, y:y+0.33, w:5, h:0.25, fontSize:10, fontFace:F.body, color:C.muted });
-      s.addText(item.text,  { x:0.72, y:y+0.6,  w:W-1.4, h:1.0, fontSize:14, fontFace:F.body, color:C.dark, lineSpacingMultiple:1.5 });
+      s.addText(item.label, { x:0.72, y:y+0.05, w:3,     h:0.28, fontSize:10, fontFace:F.body, color:C.accent, charSpacing:4 });
+      s.addText(item.sub,   { x:0.72, y:y+0.33, w:5,     h:0.25, fontSize:10, fontFace:F.body, color:C.muted });
+      s.addText(item.text,  { x:0.72, y:y+0.6,  w:W-1.4, h:1.0,  fontSize:14, fontFace:F.body, color:C.dark, lineSpacingMultiple:1.5 });
     });
   }
   { const s = contentSlide({ bg:C.cream }); addSectionHeader(s,'BRAND CORE · VALUES'); addPageTitle(s,'The Values That Drive Every Decision');
-    const values = (d.brand_core?.values||[]).slice(0,4), cw = (W-0.8)/2;
+    const values=(d.brand_core?.values||[]).slice(0,4), cw=(W-0.8)/2;
     values.forEach((v,i) => {
       const col=i%2, row=Math.floor(i/2), x=0.4+col*(cw+0.1), y=1.65+row*2.55;
       s.addShape(pres.shapes.RECTANGLE, { x, y, w:cw-0.1, h:2.35, fill:{ color:C.white }, line:{ color:C.border, width:1 } });
-      s.addShape(pres.shapes.RECTANGLE, { x, y, w:0.06, h:2.35, fill:{ color:C.accent } });
-      s.addText(v.name||'',        { x:x+0.22, y:y+0.2,  w:cw-0.5, h:0.4,  fontSize:16, fontFace:F.head, color:C.dark, bold:false });
-      s.addText(v.description||'', { x:x+0.22, y:y+0.65, w:cw-0.5, h:1.5,  fontSize:12, fontFace:F.body, color:C.muted, lineSpacingMultiple:1.5 });
+      s.addShape(pres.shapes.RECTANGLE, { x, y, w:0.06,   h:2.35, fill:{ color:C.accent } });
+      s.addText(v.name||'',        { x:x+0.22, y:y+0.2,  w:cw-0.5, h:0.4, fontSize:16, fontFace:F.head, color:C.dark, bold:false });
+      s.addText(v.description||'', { x:x+0.22, y:y+0.65, w:cw-0.5, h:1.5, fontSize:12, fontFace:F.body, color:C.muted, lineSpacingMultiple:1.5 });
     });
   }
   { const s = contentSlide(); addSectionHeader(s,'BRAND CORE · PERSONALITY + VOICE'); addPageTitle(s,'How We Feel & How We Sound');
@@ -795,15 +742,15 @@ async function buildPptx(d) {
     [{ num:'01', label:'TAGLINE', text:d.differentiation?.messaging?.tagline||d.tagline||'' },{ num:'02', label:'BRAND STATEMENT', text:d.differentiation?.messaging?.brand_statement||'' },{ num:'03', label:'ELEVATOR PITCH', text:d.differentiation?.messaging?.elevator||'' },{ num:'04', label:'SERVICE PROOF POINT', text:d.differentiation?.messaging?.proof_point||'' }].forEach((lv,i) => {
       const y=1.55+i*1.3, tc=i===0?C.cream:C.dark, tm=i===0?'D0C8C0':C.muted;
       s.addShape(pres.shapes.RECTANGLE, { x:0.5, y, w:W-1, h:1.1, fill:{ color:i===0?C.dark:C.cream }, line:{ color:C.border, width:1 } });
-      s.addText(lv.num,   { x:0.7, y:y+0.1, w:0.6, h:0.35, fontSize:14, fontFace:F.head, color:C.accent });
-      s.addText(lv.label, { x:1.3, y:y+0.1, w:3.5, h:0.28, fontSize:9,  fontFace:F.body, color:tm, charSpacing:3 });
-      s.addText(lv.text,  { x:1.3, y:y+0.42,w:W-2.2,h:0.55, fontSize:13, fontFace:F.body, color:tc, lineSpacingMultiple:1.4 });
+      s.addText(lv.num,   { x:0.7, y:y+0.1,  w:0.6,   h:0.35, fontSize:14, fontFace:F.head, color:C.accent });
+      s.addText(lv.label, { x:1.3, y:y+0.1,  w:3.5,   h:0.28, fontSize:9,  fontFace:F.body, color:tm, charSpacing:3 });
+      s.addText(lv.text,  { x:1.3, y:y+0.42, w:W-2.2, h:0.55, fontSize:13, fontFace:F.body, color:tc, lineSpacingMultiple:1.4 });
     });
   }
 
   sectionSlide('06','Visual Direction');
   { const s = contentSlide({ bg:C.cream }); addSectionHeader(s,'VISUAL DIRECTION'); addPageTitle(s,'The Look & Feel');
-    const mood = d.visual?.mood_words||[];
+    const mood=d.visual?.mood_words||[];
     s.addText('PALETTE', { x:0.5, y:1.6, w:4, h:0.28, fontSize:10, fontFace:F.body, color:C.muted, charSpacing:4 });
     [{ color:C.dark, label:'Primary' },{ color:C.mid, label:'Secondary' },{ color:C.accent, label:'Accent' },{ color:C.cream, label:'Background' }].forEach((sw,i) => {
       const x=0.5+i*1.65;
@@ -832,7 +779,7 @@ async function buildPptx(d) {
     services.forEach((svc,i) => {
       const col=i%cols, row=Math.floor(i/cols), x=0.4+col*(cw+0.08), y=1.65+row*2.4, parts=svc.split(' — '), heading=parts[0]||svc, body=parts[1]||'';
       s.addShape(pres.shapes.RECTANGLE, { x, y, w:cw-0.08, h:2.2, fill:{ color:C.white }, line:{ color:C.border, width:1 } });
-      s.addShape(pres.shapes.RECTANGLE, { x, y, w:0.06, h:2.2, fill:{ color:C.accent } });
+      s.addShape(pres.shapes.RECTANGLE, { x, y, w:0.06,    h:2.2, fill:{ color:C.accent } });
       s.addText(heading, { x:x+0.22, y:y+0.18, w:cw-0.5, h:0.4, fontSize:14, fontFace:F.head, color:C.dark });
       if (body) s.addText(body, { x:x+0.22, y:y+0.62, w:cw-0.5, h:1.4, fontSize:11, fontFace:F.body, color:C.muted, lineSpacingMultiple:1.5 });
     });
@@ -875,111 +822,104 @@ async function buildPptx(d) {
 function sanitizeHex(hex) { if (!hex) return null; return hex.replace(/[^0-9A-Fa-f]/g,'').slice(0,6)||null; }
 
 function fireConfetti() {
-  const canvas = document.getElementById('confetti-canvas');
-  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-  const ctx = canvas.getContext('2d');
-  const colours = ['#8A9E7B','#C4785A','#526148','#C4D4B8','#E8DDD0','#F7F3EE','#2C2C28'];
-  const pieces = Array.from({length:130}, () => ({ x:Math.random()*canvas.width, y:-10-Math.random()*140, w:6+Math.random()*8, h:4+Math.random()*5, colour:colours[Math.floor(Math.random()*colours.length)], rot:Math.random()*Math.PI*2, vx:(Math.random()-0.5)*3, vy:2+Math.random()*4, vr:(Math.random()-0.5)*0.2 }));
-  let frame = 0;
-  function draw() {
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    pieces.forEach(p => { p.x+=p.vx; p.y+=p.vy; p.vy+=0.06; p.rot+=p.vr; ctx.save(); ctx.globalAlpha=Math.max(0,1-frame/85); ctx.translate(p.x,p.y); ctx.rotate(p.rot); ctx.fillStyle=p.colour; ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); ctx.restore(); });
-    frame++; if(frame<95) requestAnimationFrame(draw); else ctx.clearRect(0,0,canvas.width,canvas.height);
-  }
+  const canvas=document.getElementById('confetti-canvas');
+  canvas.width=window.innerWidth; canvas.height=window.innerHeight;
+  const ctx=canvas.getContext('2d');
+  const colours=['#8A9E7B','#C4785A','#526148','#C4D4B8','#E8DDD0','#F7F3EE','#2C2C28'];
+  const pieces=Array.from({length:130},()=>({x:Math.random()*canvas.width,y:-10-Math.random()*140,w:6+Math.random()*8,h:4+Math.random()*5,colour:colours[Math.floor(Math.random()*colours.length)],rot:Math.random()*Math.PI*2,vx:(Math.random()-0.5)*3,vy:2+Math.random()*4,vr:(Math.random()-0.5)*0.2}));
+  let frame=0;
+  function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);pieces.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=0.06;p.rot+=p.vr;ctx.save();ctx.globalAlpha=Math.max(0,1-frame/85);ctx.translate(p.x,p.y);ctx.rotate(p.rot);ctx.fillStyle=p.colour;ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);ctx.restore();});frame++;if(frame<95)requestAnimationFrame(draw);else ctx.clearRect(0,0,canvas.width,canvas.height);}
   draw();
 }
 
 async function skipQuestion() { document.getElementById('input').value=''; await sendWithText("Let's skip this for now and come back to it at the end of this phase."); }
 
 async function sendWithText(text) {
-  addUserMessage(text); setInputDisabled(true); state.generating = true;
-  let searchContext = null;
-  try { if (shouldSearch(text)) { showSearchIndicator(); searchContext = await searchForContext(text).catch(()=>null); hideSearchIndicator(); } } catch(e) { hideSearchIndicator(); }
+  addUserMessage(text); setInputDisabled(true); state.generating=true;
+  let searchContext=null;
+  try { if(shouldSearch(text)){showSearchIndicator();searchContext=await searchForContext(text).catch(()=>null);hideSearchIndicator();} } catch(e){hideSearchIndicator();}
   showTyping();
-  try { const raw = await callClaude(text, searchContext); hideTyping(); const {display,synthDisplay,deckReady} = parseResponse(raw); addAgentMessage(display,synthDisplay,deckReady); }
-  catch(e) { hideTyping(); addAgentMessage(`Error: ${e.message}. Run this from https:// not file://`, null, false); }
-  state.generating = false; setInputDisabled(false); document.getElementById('input').focus();
+  try { const raw=await callClaude(text,searchContext); hideTyping(); const{display,synthDisplay,deckReady}=parseResponse(raw); addAgentMessage(display,synthDisplay,deckReady); }
+  catch(e){hideTyping();addAgentMessage(`Error: ${e.message}`,null,false);}
+  state.generating=false; setInputDisabled(false); document.getElementById('input').focus();
 }
 
 function showResumeBanner(saved) {
-  const msgs = document.getElementById('messages');
-  const banner = document.createElement('div'); banner.className = 'resume-banner';
-  const phaseName = PHASES[saved.phase]?.name || 'previous session';
-  banner.innerHTML = `<div><strong>You left off in Phase ${saved.phase} · ${phaseName}.</strong> Pick up where you were?</div><button class="resume-btn" onclick="resumeSession()">Resume</button><button class="resume-discard" onclick="discardSession()">Start fresh</button>`;
-  msgs.appendChild(banner); window._savedSession = saved;
+  const msgs=document.getElementById('messages');
+  const banner=document.createElement('div'); banner.className='resume-banner';
+  banner.innerHTML=`<div><strong>You left off in Phase ${saved.phase} · ${PHASES[saved.phase]?.name||''}.</strong> Pick up where you were?</div><button class="resume-btn" onclick="resumeSession()">Resume</button><button class="resume-discard" onclick="discardSession()">Start fresh</button>`;
+  msgs.appendChild(banner); window._savedSession=saved;
 }
 
 function resumeSession() {
-  const saved = window._savedSession; if (!saved) return;
+  const saved=window._savedSession; if(!saved)return;
   state.phase=saved.phase; state.history=saved.history; state.briefs=saved.briefs; state.brandName=saved.brandName||'';
   updatePhasePills(); document.querySelector('.resume-banner')?.remove();
-  state.history.forEach(msg => {
-    const text = typeof msg.content==='string' ? msg.content : msg.content?.find?.(b=>b.type==='text')?.text||'';
-    if (!text) return;
-    if (msg.role==='user') addUserMessage(text);
-    else { const {display,synthDisplay} = parseResponse(text); addAgentMessage(display,synthDisplay,false); }
+  state.history.forEach(msg=>{
+    const text=typeof msg.content==='string'?msg.content:msg.content?.find?.(b=>b.type==='text')?.text||'';
+    if(!text)return;
+    if(msg.role==='user')addUserMessage(text);
+    else{const{display,synthDisplay}=parseResponse(text);addAgentMessage(display,synthDisplay,false);}
   });
   scrollBottom();
 }
 
-function discardSession() { clearSession(); document.querySelector('.resume-banner')?.remove(); init(); }
+function discardSession(){clearSession();document.querySelector('.resume-banner')?.remove();init();}
 
-function shouldSearch(text) {
-  return /\b(like|similar to|compared to|competing with|competitor|vs\.?|rival|have you heard of|do you know)\b/i.test(text) || (/\b[A-Z][a-zA-Z]+(?: [A-Z][a-zA-Z]+)?\b/.test(text) && text.length > 20);
+function shouldSearch(text){
+  return /\b(like|similar to|compared to|competing with|competitor|vs\.?|rival|have you heard of|do you know)\b/i.test(text)||(/\b[A-Z][a-zA-Z]+(?: [A-Z][a-zA-Z]+)?\b/.test(text)&&text.length>20);
 }
 
-async function searchForContext(text) {
-  try {
-    const res = await fetch('/.netlify/functions/chat', { method:'POST', headers:{ 'Content-Type':'application/json','x-api-key':getApiKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true' }, body:JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:500, tools:[{ type:'web_search_20250305', name:'web_search' }], system:'Research assistant. Search for any brand, company, or industry mentioned. Return a concise 3–4 sentence factual summary. Plain text only.', messages:[{ role:'user', content:`Brand strategy context: "${text.slice(0,300)}"\n\nSearch for specific brands or companies mentioned and summarise.` }] }) });
-    if (!res.ok) return null;
-    const data = await res.json();
-    const result = data.content?.filter(b=>b.type==='text').map(b=>b.text).join('')||'';
+async function searchForContext(text){
+  try{
+    const res=await fetch('/.netlify/functions/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,tools:[{type:'web_search_20250305',name:'web_search'}],system:'Research assistant. Search for any brand or company mentioned. Return a concise 3–4 sentence summary. Plain text only.',messages:[{role:'user',content:`Brand strategy context: "${text.slice(0,300)}"\n\nSearch for specific brands or companies mentioned and summarise.`}]})});
+    if(!res.ok)return null;
+    const data=await res.json();
+    const result=data.content?.filter(b=>b.type==='text').map(b=>b.text).join('')||'';
     return result.length>40?result:null;
-  } catch(e) { return null; }
+  }catch(e){return null;}
 }
 
-function showSearchIndicator() {
-  const msgs=document.getElementById('messages'), el=document.createElement('div'); el.id='search-ind';
+function showSearchIndicator(){
+  const msgs=document.getElementById('messages'),el=document.createElement('div');el.id='search-ind';
   el.style.cssText='display:flex;align-items:center;gap:8px;font-size:12px;color:#7A776F;padding:4px 0 10px 52px;';
   el.innerHTML='<span style="width:6px;height:6px;background:#C4785A;border-radius:50%;animation:sdp 1.2s ease-in-out infinite;display:inline-block"></span>Searching...';
-  if (!document.getElementById('search-anim')) { const s=document.createElement('style'); s.id='search-anim'; s.textContent='@keyframes sdp{0%,100%{opacity:0.3}50%{opacity:1}}'; document.head.appendChild(s); }
-  msgs.appendChild(el); scrollBottom();
+  if(!document.getElementById('search-anim')){const s=document.createElement('style');s.id='search-anim';s.textContent='@keyframes sdp{0%,100%{opacity:0.3}50%{opacity:1}}';document.head.appendChild(s);}
+  msgs.appendChild(el);scrollBottom();
 }
-function hideSearchIndicator() { document.getElementById('search-ind')?.remove(); }
+function hideSearchIndicator(){document.getElementById('search-ind')?.remove();}
 
-async function init() { if (!checkApiKey()) return; startSession(); }
-
-async function startSession() {
-  const saved = loadSession();
-  if (saved) { showResumeBanner(saved); setInputDisabled(false); document.getElementById('input').focus(); return; }
-  setInputDisabled(true); showTyping();
-  try {
-    const raw = await callClaude("Greet them as Sam. Say exactly: Hi, I'm Sam 👋 I'll be running your brand strategy session today. Then on a new line say: Let's start simple: what's your brand, and how did it start? Do not add anything else.");
-    hideTyping(); const {display,synthDisplay,deckReady}=parseResponse(raw); addAgentMessage(display,synthDisplay,deckReady);
-  } catch(e) { hideTyping(); addAgentMessage("Hi, I'm Sam 👋\n\nI'll be running your brand strategy session today.\n\nLet's start simple: what's your brand, and how did it start?", null, false); }
-  setInputDisabled(false); document.getElementById('input').focus();
+async function init(){
+  const saved=loadSession();
+  if(saved){showResumeBanner(saved);setInputDisabled(false);document.getElementById('input').focus();return;}
+  setInputDisabled(true);showTyping();
+  try{
+    const raw=await callClaude("Greet them as Sam. Say exactly: Hi, I'm Sam 👋 I'll be running your brand strategy session today. Then on a new line say: Let's start simple: what's your brand, and how did it start? Do not add anything else.");
+    hideTyping();const{display,synthDisplay,deckReady}=parseResponse(raw);addAgentMessage(display,synthDisplay,deckReady);
+  }catch(e){hideTyping();addAgentMessage("Hi, I'm Sam 👋\n\nI'll be running your brand strategy session today.\n\nLet's start simple: what's your brand, and how did it start?",null,false);}
+  setInputDisabled(false);document.getElementById('input').focus();
 }
 
-let recognition=null, isRecording=false;
-function toggleMic() { if (isRecording) stopMic(); else startMic(); }
-function startMic() {
+let recognition=null,isRecording=false;
+function toggleMic(){if(isRecording)stopMic();else startMic();}
+function startMic(){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if (!SR) { alert('Voice input isn\'t supported in this browser. Try Chrome.'); return; }
-  recognition=new SR(); recognition.continuous=true; recognition.interimResults=true; recognition.lang='en-US';
-  const input=document.getElementById('input'), btn=document.getElementById('mic-btn'); let finalTranscript=input.value;
-  recognition.onstart=()=>{ isRecording=true; btn.classList.add('recording'); if(!finalTranscript) input.placeholder='Listening…'; };
-  recognition.onresult=(e)=>{ let interim=''; for(let i=e.resultIndex;i<e.results.length;i++){ const t=e.results[i][0].transcript; if(e.results[i].isFinal) finalTranscript+=t+' '; else interim=t; } input.value=finalTranscript+interim; };
-  recognition.onerror=(e)=>{ if(e.error!=='no-speech') stopMic(); };
-  recognition.onend=()=>{ input.value=input.value.trim(); stopMic(); };
+  if(!SR){alert('Voice input isn\'t supported in this browser. Try Chrome.');return;}
+  recognition=new SR();recognition.continuous=true;recognition.interimResults=true;recognition.lang='en-US';
+  const input=document.getElementById('input'),btn=document.getElementById('mic-btn');let finalTranscript=input.value;
+  recognition.onstart=()=>{isRecording=true;btn.classList.add('recording');if(!finalTranscript)input.placeholder='Listening…';};
+  recognition.onresult=(e)=>{let interim='';for(let i=e.resultIndex;i<e.results.length;i++){const t=e.results[i][0].transcript;if(e.results[i].isFinal)finalTranscript+=t+' ';else interim=t;}input.value=finalTranscript+interim;};
+  recognition.onerror=(e)=>{if(e.error!=='no-speech')stopMic();};
+  recognition.onend=()=>{input.value=input.value.trim();stopMic();};
   recognition.start();
 }
-function stopMic() { isRecording=false; document.getElementById('mic-btn').classList.remove('recording'); document.getElementById('input').placeholder='Type your answer here…'; if(recognition){recognition.stop();recognition=null;} }
+function stopMic(){isRecording=false;document.getElementById('mic-btn').classList.remove('recording');document.getElementById('input').placeholder='Type your answer here…';if(recognition){recognition.stop();recognition=null;}}
 
-function getFileIcon(t) { if(t.startsWith('image/'))return'🖼️'; if(t.startsWith('audio/'))return'🎵'; if(t.startsWith('video/'))return'🎬'; if(t==='application/pdf')return'📄'; return'📎'; }
-function handleFileAttach(input) { Array.from(input.files).forEach(file=>{ const reader=new FileReader(); reader.onload=(e)=>{ const[,data]=e.target.result.split(','); const isImage=file.type.startsWith('image/'); state.attachments.push({name:file.name,fileType:file.type,mediaType:file.type,type:isImage?'image':'other',data:isImage?data:null,preview:isImage?e.target.result:null}); renderAttachmentStrip(); }; reader.readAsDataURL(file); }); input.value=''; }
-function renderAttachmentStrip() { const strip=document.getElementById('attachment-strip'); strip.innerHTML=''; if(!state.attachments.length){strip.classList.remove('has-files');return;} strip.classList.add('has-files'); state.attachments.forEach((a,i)=>{ const chip=document.createElement('div'); chip.className='attachment-chip'; const prev=a.preview?`<img src="${a.preview}" class="chip-img-preview">`:`<span class="chip-icon">${getFileIcon(a.fileType)}</span>`; chip.innerHTML=`${prev}<span class="chip-name">${a.name}</span><button class="chip-remove" onclick="removeAttachment(${i})">×</button>`; strip.appendChild(chip); }); }
+function getFileIcon(t){if(t.startsWith('image/'))return'🖼️';if(t.startsWith('audio/'))return'🎵';if(t.startsWith('video/'))return'🎬';if(t==='application/pdf')return'📄';return'📎';}
+function handleFileAttach(input){Array.from(input.files).forEach(file=>{const reader=new FileReader();reader.onload=(e)=>{const[,data]=e.target.result.split(',');const isImage=file.type.startsWith('image/');state.attachments.push({name:file.name,fileType:file.type,mediaType:file.type,type:isImage?'image':'other',data:isImage?data:null,preview:isImage?e.target.result:null});renderAttachmentStrip();};reader.readAsDataURL(file);});input.value='';}
+function renderAttachmentStrip(){const strip=document.getElementById('attachment-strip');strip.innerHTML='';if(!state.attachments.length){strip.classList.remove('has-files');return;}strip.classList.add('has-files');state.attachments.forEach((a,i)=>{const chip=document.createElement('div');chip.className='attachment-chip';const prev=a.preview?`<img src="${a.preview}" class="chip-img-preview">`:`<span class="chip-icon">${getFileIcon(a.fileType)}</span>`;chip.innerHTML=`${prev}<span class="chip-name">${a.name}</span><button class="chip-remove" onclick="removeAttachment(${i})">×</button>`;strip.appendChild(chip);});}
 function removeAttachment(i){state.attachments.splice(i,1);renderAttachmentStrip();}
-function attachmentSummaryText(){ if(!state.attachments.length)return''; const imgs=state.attachments.filter(a=>a.type==='image').length; const other=state.attachments.filter(a=>a.type!=='image'); const parts=[]; if(imgs)parts.push(`${imgs} image${imgs>1?'s':''}`); other.forEach(a=>parts.push(a.name)); return parts.length?` [+ ${parts.join(', ')}]`:''; }
+function attachmentSummaryText(){if(!state.attachments.length)return'';const imgs=state.attachments.filter(a=>a.type==='image').length;const other=state.attachments.filter(a=>a.type!=='image');const parts=[];if(imgs)parts.push(`${imgs} image${imgs>1?'s':''}`);other.forEach(a=>parts.push(a.name));return parts.length?` [+ ${parts.join(', ')}]`:'';}
 
 init();
 </script>
