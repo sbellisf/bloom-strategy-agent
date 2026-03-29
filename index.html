@@ -2,261 +2,118 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Brand Strategy Agent</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
 <style>
   :root {
-    --ink: #1A1A17;
-    --charcoal: #2C2C28;
-    --muted: #7A776F;
-    --border: #DDD8D0;
-    --cream: #F7F3EE;
-    --warm: #E8DDD0;
-    --white: #FDFCFA;
-    --sage: #8A9E7B;
-    --sage-light: #C4D4B8;
-    --sage-pale: #EEF3EA;
-    --sage-dark: #526148;
-    --terra: #C4785A;
-    --terra-light: #F2E4DC;
-    --agent: #2C2C28;
-    --user-bg: #EEF3EA;
+    --ink: #1A1A17; --charcoal: #2C2C28; --muted: #7A776F; --border: #DDD8D0;
+    --cream: #F7F3EE; --warm: #E8DDD0; --white: #FDFCFA; --sage: #8A9E7B;
+    --sage-light: #C4D4B8; --sage-pale: #EEF3EA; --sage-dark: #526148;
+    --terra: #C4785A; --terra-light: #F2E4DC; --agent: #2C2C28; --user-bg: #EEF3EA;
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--charcoal); min-height: 100vh; display: flex; flex-direction: column; }
+  body::before { content: ''; position: fixed; top: -160px; right: -160px; width: 480px; height: 480px; background: radial-gradient(circle, rgba(138,158,123,0.11) 0%, transparent 70%); pointer-events: none; z-index: 0; }
+  body::after  { content: ''; position: fixed; bottom: -100px; left: -100px; width: 380px; height: 380px; background: radial-gradient(circle, rgba(196,120,90,0.08) 0%, transparent 70%); pointer-events: none; z-index: 0; }
 
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--cream);
-    color: var(--charcoal);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-
-  body::before {
-    content: '';
-    position: fixed; top: -160px; right: -160px;
-    width: 480px; height: 480px;
-    background: radial-gradient(circle, rgba(138,158,123,0.11) 0%, transparent 70%);
-    pointer-events: none; z-index: 0;
-  }
-  body::after {
-    content: '';
-    position: fixed; bottom: -100px; left: -100px;
-    width: 380px; height: 380px;
-    background: radial-gradient(circle, rgba(196,120,90,0.08) 0%, transparent 70%);
-    pointer-events: none; z-index: 0;
-  }
-
-  header {
-    position: sticky; top: 0; z-index: 100;
-    background: rgba(247,243,238,0.92);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
-    padding: 14px 24px;
-    display: flex; align-items: center; justify-content: space-between;
-  }
-
+  header { position: sticky; top: 0; z-index: 100; background: rgba(247,243,238,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; }
   .logo-row { display: flex; align-items: center; gap: 10px; }
-  .logo-leaf {
-    width: 30px; height: 30px;
-    background: var(--sage);
-    border-radius: 50% 50% 50% 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 13px;
-  }
-  .logo-name {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 18px; font-weight: 400;
-    letter-spacing: 0.12em; color: var(--sage-dark);
-    text-transform: uppercase;
-  }
+  .logo-leaf { width: 30px; height: 30px; background: var(--sage); border-radius: 50% 50% 50% 10px; display: flex; align-items: center; justify-content: center; font-size: 13px; }
+  .logo-name { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 400; letter-spacing: 0.12em; color: var(--sage-dark); text-transform: uppercase; }
   .logo-divider { color: var(--border); margin: 0 6px; }
   .logo-sub { font-size: 13px; color: var(--muted); font-weight: 300; }
 
   .phase-track { display: flex; align-items: center; gap: 6px; }
-  .phase-pill {
-    font-size: 11px; font-weight: 500;
-    padding: 4px 11px; border-radius: 999px;
-    border: 1px solid var(--border);
-    color: var(--muted); background: var(--white);
-    letter-spacing: 0.05em; transition: all 0.25s; white-space: nowrap;
-  }
+  .phase-pill { font-size: 11px; font-weight: 500; padding: 4px 11px; border-radius: 999px; border: 1px solid var(--border); color: var(--muted); background: var(--white); letter-spacing: 0.05em; transition: all 0.25s; white-space: nowrap; }
   .phase-pill.active { background: var(--charcoal); border-color: var(--charcoal); color: var(--cream); }
-  .phase-pill.done { background: var(--sage-pale); border-color: var(--sage-light); color: var(--sage-dark); }
+  .phase-pill.done   { background: var(--sage-pale); border-color: var(--sage-light); color: var(--sage-dark); }
 
-  .chat-wrap {
-    flex: 1; max-width: 780px; width: 100%;
-    margin: 0 auto; padding: 32px 24px 180px;
-    position: relative; z-index: 1;
-  }
-
+  .chat-wrap { flex: 1; max-width: 780px; width: 100%; margin: 0 auto; padding: 32px 24px 180px; position: relative; z-index: 1; }
   .messages { display: flex; flex-direction: column; gap: 20px; }
 
-  .msg {
-    display: flex; gap: 12px;
-    animation: msgIn 0.28s ease forwards;
-    opacity: 0; transform: translateY(8px);
-  }
+  .msg { display: flex; gap: 12px; animation: msgIn 0.28s ease forwards; opacity: 0; transform: translateY(8px); }
   @keyframes msgIn { to { opacity: 1; transform: translateY(0); } }
-
   .msg.agent { align-items: flex-start; }
   .msg.user  { align-items: flex-start; flex-direction: row-reverse; }
 
-  .avatar {
-    width: 34px; height: 34px; border-radius: 50%;
-    flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 14px;
-  }
+  .avatar { width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 14px; }
   .avatar.agent-av { background: var(--charcoal); color: var(--cream); font-family: 'Cormorant Garamond', serif; font-size: 16px; }
   .avatar.user-av  { background: var(--sage-light); color: var(--sage-dark); }
 
-  .bubble {
-    max-width: 78%; padding: 14px 18px; border-radius: 16px;
-    font-size: 14px; line-height: 1.72; position: relative;
-  }
+  .bubble { max-width: 78%; padding: 14px 18px; border-radius: 16px; font-size: 14px; line-height: 1.72; position: relative; }
   .msg.agent .bubble { background: var(--white); border: 1px solid var(--border); border-top-left-radius: 4px; color: var(--charcoal); }
   .msg.user  .bubble { background: var(--sage-pale); border: 1px solid var(--sage-light); border-top-right-radius: 4px; color: var(--charcoal); }
-
   .bubble p { margin-bottom: 0.5em; }
   .bubble p:last-child { margin-bottom: 0; }
   .bubble strong { font-weight: 500; color: var(--ink); }
   .bubble em { font-style: italic; color: var(--muted); }
 
-  .phase-chip {
-    display: inline-flex; align-items: center; gap: 5px;
-    font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
-    background: var(--warm); color: var(--muted);
-    padding: 3px 10px; border-radius: 999px; margin-bottom: 10px;
-  }
+  .phase-chip { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; background: var(--warm); color: var(--muted); padding: 3px 10px; border-radius: 999px; margin-bottom: 10px; }
 
-  .synthesis-card {
-    background: var(--sage-pale); border: 1px solid var(--sage-light);
-    border-radius: 12px; padding: 14px 16px; margin-top: 12px;
-    font-size: 13px; color: var(--sage-dark); line-height: 1.6;
-  }
-  .synthesis-card .syn-title {
-    font-size: 10px; font-weight: 500; letter-spacing: 0.08em;
-    text-transform: uppercase; color: var(--sage); margin-bottom: 8px;
-  }
+  .synthesis-card { background: var(--sage-pale); border: 1px solid var(--sage-light); border-radius: 12px; padding: 14px 16px; margin-top: 12px; font-size: 13px; color: var(--sage-dark); line-height: 1.6; }
+  .synthesis-card .syn-title { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--sage); margin-bottom: 8px; }
 
-  .typing-bubble {
-    background: var(--white); border: 1px solid var(--border);
-    border-top-left-radius: 4px; border-radius: 16px;
-    padding: 14px 18px; display: inline-flex; align-items: center; gap: 4px;
-  }
-  .typing-bubble span {
-    width: 6px; height: 6px; background: var(--muted); border-radius: 50%;
-    animation: blink 1.3s ease-in-out infinite;
-  }
+  .typing-bubble { background: var(--white); border: 1px solid var(--border); border-top-left-radius: 4px; border-radius: 16px; padding: 14px 18px; display: inline-flex; align-items: center; gap: 4px; }
+  .typing-bubble span { width: 6px; height: 6px; background: var(--muted); border-radius: 50%; animation: blink 1.3s ease-in-out infinite; }
   .typing-bubble span:nth-child(2) { animation-delay: 0.2s; }
   .typing-bubble span:nth-child(3) { animation-delay: 0.4s; }
   @keyframes blink { 0%,80%,100%{opacity:0.3;transform:scale(0.8)} 40%{opacity:1;transform:scale(1)} }
 
-  .deck-card {
-    background: var(--charcoal); border-radius: 18px; padding: 28px;
-    color: var(--cream); margin-top: 8px;
-    animation: msgIn 0.28s ease forwards; opacity: 0;
-  }
+  .deck-card { background: var(--charcoal); border-radius: 18px; padding: 28px; color: var(--cream); margin-top: 8px; animation: msgIn 0.28s ease forwards; opacity: 0; }
   .deck-card h3 { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 300; margin-bottom: 8px; }
   .deck-card p  { font-size: 13px; color: rgba(247,243,238,0.65); line-height: 1.6; margin-bottom: 20px; }
-  .btn-deck {
-    background: var(--sage); color: #fff; border: none; border-radius: 10px;
-    padding: 12px 24px; font-size: 14px; font-family: 'DM Sans', sans-serif;
-    cursor: pointer; transition: background 0.2s;
-    display: inline-flex; align-items: center; gap: 8px;
-  }
+  .btn-deck { background: var(--sage); color: #fff; border: none; border-radius: 10px; padding: 12px 24px; font-size: 14px; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: background 0.2s; display: inline-flex; align-items: center; gap: 8px; }
   .btn-deck:hover { background: var(--sage-dark); }
   .btn-deck:disabled { opacity: 0.5; cursor: not-allowed; }
   .deck-progress { margin-top: 14px; font-size: 13px; color: rgba(247,243,238,0.7); display: none; }
   .deck-progress.show { display: block; }
 
-  .input-wrap {
-    position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
-    padding: 16px 24px 20px;
-    background: linear-gradient(to top, var(--cream) 70%, transparent);
-  }
+  .input-wrap { position: fixed; bottom: 0; left: 0; right: 0; z-index: 100; padding: 16px 24px 20px; background: linear-gradient(to top, var(--cream) 70%, transparent); }
   .input-inner { max-width: 780px; margin: 0 auto; display: flex; gap: 10px; align-items: flex-end; }
 
   .attachment-strip { max-width: 780px; margin: 0 auto 8px; display: none; gap: 8px; flex-wrap: wrap; }
   .attachment-strip.has-files { display: flex; }
-  .attachment-chip {
-    display: flex; align-items: center; gap: 6px;
-    background: var(--white); border: 1px solid var(--border);
-    border-radius: 8px; padding: 5px 10px; font-size: 12px; color: var(--charcoal);
-  }
+  .attachment-chip { display: flex; align-items: center; gap: 6px; background: var(--white); border: 1px solid var(--border); border-radius: 8px; padding: 5px 10px; font-size: 12px; color: var(--charcoal); }
   .attachment-chip .chip-icon { font-size: 14px; }
   .attachment-chip .chip-name { max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .attachment-chip .chip-remove { cursor: pointer; color: var(--muted); font-size: 14px; line-height: 1; margin-left: 2px; background: none; border: none; padding: 0; }
   .chip-img-preview { width: 28px; height: 28px; border-radius: 4px; object-fit: cover; flex-shrink: 0; }
 
-  .btn-attach {
-    width: 48px; height: 48px; flex-shrink: 0;
-    background: var(--white); color: var(--muted);
-    border: 1px solid var(--border); border-radius: 12px;
-    cursor: pointer; font-size: 18px;
-    display: flex; align-items: center; justify-content: center;
-    transition: border-color 0.2s, color 0.2s;
-  }
+  .btn-attach { width: 48px; height: 48px; flex-shrink: 0; background: var(--white); color: var(--muted); border: 1px solid var(--border); border-radius: 12px; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: border-color 0.2s, color 0.2s; }
   .btn-attach:hover { border-color: var(--sage); color: var(--sage-dark); }
 
-  .input-field {
-    flex: 1; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--charcoal);
-    background: var(--white); border: 1px solid var(--border); border-radius: 14px;
-    padding: 12px 16px; outline: none; resize: none;
-    min-height: 48px; max-height: 140px; line-height: 1.5;
-    transition: border-color 0.2s, box-shadow 0.2s; overflow-y: auto;
-  }
+  .input-field { flex: 1; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--charcoal); background: var(--white); border: 1px solid var(--border); border-radius: 14px; padding: 12px 16px; outline: none; resize: none; min-height: 48px; max-height: 140px; line-height: 1.5; transition: border-color 0.2s, box-shadow 0.2s; overflow-y: auto; }
   .input-field:focus { border-color: var(--sage); box-shadow: 0 0 0 3px rgba(138,158,123,0.14); }
   .input-field::placeholder { color: var(--muted); }
 
-  .btn-send {
-    width: 48px; height: 48px; flex-shrink: 0;
-    background: var(--charcoal); color: var(--cream);
-    border: none; border-radius: 12px; cursor: pointer; font-size: 18px;
-    display: flex; align-items: center; justify-content: center; transition: background 0.2s;
-  }
+  .btn-send { width: 48px; height: 48px; flex-shrink: 0; background: var(--charcoal); color: var(--cream); border: none; border-radius: 12px; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
   .btn-send:hover { background: var(--sage-dark); }
   .btn-send:disabled { opacity: 0.4; cursor: not-allowed; }
 
-  .btn-skip {
-    height: 48px; flex-shrink: 0; padding: 0 16px;
-    background: transparent; color: var(--muted);
-    border: 1px solid var(--border); border-radius: 12px;
-    font-family: 'DM Sans', sans-serif; font-size: 13px;
-    cursor: pointer; transition: all 0.2s; white-space: nowrap;
-  }
+  .btn-skip { height: 48px; flex-shrink: 0; padding: 0 16px; background: transparent; color: var(--muted); border: 1px solid var(--border); border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
   .btn-skip:hover { border-color: var(--sage); color: var(--sage-dark); }
   .btn-skip:disabled { opacity: 0.4; cursor: not-allowed; }
 
-  .btn-mic {
-    width: 48px; height: 48px; flex-shrink: 0;
-    background: var(--white); color: var(--muted);
-    border: 1px solid var(--border); border-radius: 12px;
-    cursor: pointer; font-size: 18px;
-    display: flex; align-items: center; justify-content: center; transition: all 0.2s;
-  }
+  .btn-mic { width: 48px; height: 48px; flex-shrink: 0; background: var(--white); color: var(--muted); border: 1px solid var(--border); border-radius: 12px; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
   .btn-mic:hover { border-color: var(--sage); }
   .btn-mic.recording { background: var(--terra); border-color: var(--terra); animation: micpulse 1s ease-in-out infinite; }
   @keyframes micpulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
 
   #confetti-canvas { position: fixed; inset: 0; z-index: 9999; pointer-events: none; }
 
-  .resume-banner {
-    background: var(--sage-pale); border: 1px solid var(--sage-light);
-    border-radius: 12px; padding: 14px 18px; margin: 0 auto 20px; max-width: 600px;
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 12px; font-size: 13px; color: var(--sage-dark);
-  }
+  .resume-banner { background: var(--sage-pale); border: 1px solid var(--sage-light); border-radius: 12px; padding: 14px 18px; margin: 0 auto 20px; max-width: 600px; display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 13px; color: var(--sage-dark); }
   .resume-banner strong { font-weight: 500; }
   .resume-btn { background: var(--sage); color: #fff; border: none; border-radius: 8px; padding: 7px 16px; font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; flex-shrink: 0; }
   .resume-discard { background: none; border: none; color: var(--muted); font-size: 12px; cursor: pointer; text-decoration: underline; flex-shrink: 0; }
 
   @media (max-width: 640px) {
+    html, body { height: 100%; min-height: -webkit-fill-available; }
+    body { min-height: 100svh; }
     .phase-track { display: none; }
-    .chat-wrap { padding: 16px 12px 170px; }
+    .chat-wrap { padding: 16px 12px 160px; min-height: 0; }
+    .messages { padding-bottom: 0; }
     .bubble { max-width: 92%; padding: 11px 14px; font-size: 13px; }
     .avatar { width: 28px; height: 28px; font-size: 12px; }
     .msg { gap: 8px; }
@@ -264,11 +121,13 @@
     .logo-name { font-size: 15px; }
     .logo-sub { display: none; }
     .logo-divider { display: none; }
-    .input-wrap { padding: 10px 12px 16px; }
-    .input-inner { gap: 7px; }
-    .input-field { font-size: 16px; padding: 10px 13px; min-height: 44px; }
-    .btn-send, .btn-mic, .btn-attach { width: 44px; height: 44px; font-size: 16px; }
-    .btn-skip { padding: 0 11px; font-size: 12px; height: 44px; }
+    .input-wrap { padding: 8px 12px max(20px, env(safe-area-inset-bottom)); background: rgba(247,243,238,0.98); border-top: 1px solid var(--border); }
+    .input-inner { gap: 6px; align-items: center; }
+    .input-field { font-size: 16px; padding: 10px 16px; min-height: 44px; max-height: 120px; border-radius: 22px; background: var(--white); }
+    .btn-send { width: 40px; height: 40px; font-size: 17px; border-radius: 50%; flex-shrink: 0; }
+    .btn-mic  { width: 40px; height: 40px; font-size: 17px; border-radius: 50%; flex-shrink: 0; }
+    .btn-attach { width: 40px; height: 40px; font-size: 17px; border-radius: 50%; flex-shrink: 0; background: transparent; border: none; }
+    .btn-skip { padding: 0 12px; font-size: 12px; height: 36px; border-radius: 18px; }
     .deck-card { padding: 20px; }
     .deck-card h3 { font-size: 18px; }
     .resume-banner { flex-direction: column; align-items: flex-start; gap: 10px; padding: 12px 14px; }
@@ -320,24 +179,19 @@
 const STORAGE_KEY = 'bloom_session_v1';
 const state = { phase: 0, history: [], briefs: {}, brandName: '', generating: false, attachments: [] };
 
-function saveSession() {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ phase: state.phase, history: state.history, briefs: state.briefs, brandName: state.brandName })); } catch(e) {}
-}
-function loadSession() {
-  try { const s = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); if (s && s.history?.length > 2) return s; } catch(e) {}
-  return null;
-}
+function saveSession() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ phase: state.phase, history: state.history, briefs: state.briefs, brandName: state.brandName })); } catch(e) {} }
+function loadSession() { try { const s = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); if (s && s.history?.length > 2) return s; } catch(e) {} return null; }
 function clearSession() { localStorage.removeItem(STORAGE_KEY); }
 
 const PHASES = [
-  { id: 0, name: 'Intake',          label: 'Phase 0 · Intake' },
-  { id: 1, name: 'Positioning',     label: 'Phase 1 · Positioning' },
-  { id: 2, name: 'Audience',        label: 'Phase 2 · Audience' },
-  { id: 3, name: 'Brand Core',      label: 'Phase 3 · Brand Core' },
-  { id: 4, name: 'Naming',          label: 'Phase 4 · Naming' },
-  { id: 5, name: 'Differentiation', label: 'Phase 5 · Differentiation' },
-  { id: 6, name: 'Visual Direction',label: 'Phase 6 · Visual Direction' },
-  { id: 7, name: 'The Model',       label: 'Phase 7 · The Model' },
+  { id:0, name:'Intake',          label:'Phase 0 · Intake' },
+  { id:1, name:'Positioning',     label:'Phase 1 · Positioning' },
+  { id:2, name:'Audience',        label:'Phase 2 · Audience' },
+  { id:3, name:'Brand Core',      label:'Phase 3 · Brand Core' },
+  { id:4, name:'Naming',          label:'Phase 4 · Naming' },
+  { id:5, name:'Differentiation', label:'Phase 5 · Differentiation' },
+  { id:6, name:'Visual Direction',label:'Phase 6 · Visual Direction' },
+  { id:7, name:'The Model',       label:'Phase 7 · The Model' },
 ];
 
 function buildSystemPrompt() {
@@ -378,12 +232,7 @@ BEHAVIOR RULES:
 - At the end of Phase 7, output: <READY_FOR_DECK/>
 
 SYNTHESIS JSON FORMAT:
-{
-  "phase": 0,
-  "name": "Intake",
-  "skipped": [],
-  "data": {}
-}
+{ "phase": 0, "name": "Intake", "skipped": [], "data": {} }
 
 CURRENT PHASE: ${state.phase} — ${PHASES[state.phase]?.name}
 BRIEFS SO FAR: ${JSON.stringify(state.briefs, null, 2)}`;
@@ -604,14 +453,13 @@ async function buildPptx(d) {
     dark:   sanitizeHex(d.visual?.primary_color_hex)   || '1E1E1A',
     mid:    sanitizeHex(d.visual?.secondary_color_hex) || '3D4A35',
     accent: sanitizeHex(d.visual?.accent_color_hex)    || 'C4785A',
-    cream:  'F7F3EE', white: 'FDFCFA', border: 'DDD8D0', muted: '7A776F', sage: '8A9E7B',
+    cream: 'F7F3EE', white: 'FDFCFA', border: 'DDD8D0', muted: '7A776F', sage: '8A9E7B',
   };
   const F = { head: d.visual?.font_heading || 'Garamond', body: d.visual?.font_body || 'Calibri' };
   const W = 13.3, H = 7.5;
 
   function sectionSlide(num, title) {
-    const s = pres.addSlide();
-    s.background = { color: C.dark };
+    const s = pres.addSlide(); s.background = { color: C.dark };
     s.addShape(pres.shapes.RECTANGLE, { x:0, y:0, w:0.32, h:H, fill:{ color: C.accent } });
     s.addText(num,   { x:0.6, y:2.4, w:3, h:1.2, fontSize:72, fontFace:F.head, color:C.cream, bold:false, transparency:15 });
     s.addText(title, { x:0.6, y:3.8, w:9, h:1,   fontSize:28, fontFace:F.head, color:C.cream, bold:false });
@@ -620,16 +468,16 @@ async function buildPptx(d) {
   }
 
   function contentSlide(opts={}) {
-    const s = pres.addSlide();
-    s.background = { color: opts.bg || C.white };
+    const s = pres.addSlide(); s.background = { color: opts.bg || C.white };
     s.addShape(pres.shapes.RECTANGLE, { x:0, y:0, w:W, h:0.06, fill:{ color: C.accent } });
     s.addText((d.brand_name || '').toUpperCase(), { x:W-4.5, y:0.15, w:4.2, h:0.35, fontSize:9, fontFace:F.body, color:C.muted, align:'right', charSpacing:3 });
     return s;
   }
 
-  function addSectionHeader(slide, label) { slide.addText(label, { x:0.5, y:0.25, w:5, h:0.35, fontSize:10, fontFace:F.body, color:C.muted, charSpacing:4, bold:false }); }
-  function addPageTitle(slide, title, y)  { slide.addText(title, { x:0.5, y:y||0.65, w:W-1, h:0.75, fontSize:30, fontFace:F.head, color:C.dark, bold:false }); }
+  function addSectionHeader(s, label) { s.addText(label, { x:0.5, y:0.25, w:5, h:0.35, fontSize:10, fontFace:F.body, color:C.muted, charSpacing:4, bold:false }); }
+  function addPageTitle(s, title, y)  { s.addText(title, { x:0.5, y:y||0.65, w:W-1, h:0.75, fontSize:30, fontFace:F.head, color:C.dark, bold:false }); }
 
+  // COVER
   { const s = pres.addSlide(); s.background = { color: C.dark };
     s.addShape(pres.shapes.RECTANGLE, { x:0, y:0, w:0.32, h:H, fill:{ color: C.accent } });
     s.addText(d.brand_name || 'Your Brand', { x:0.7, y:1.8, w:10, h:1.5, fontSize:54, fontFace:F.head, color:C.cream, bold:false });
@@ -638,206 +486,188 @@ async function buildPptx(d) {
     s.addText('Working document — all content subject to revision.', { x:0.7, y:6.1, w:8, h:0.4, fontSize:10, fontFace:F.body, color:C.cream, transparency:50 });
   }
 
-  { const s = contentSlide(); addSectionHeader(s, 'CONTENTS'); addPageTitle(s, "What's Inside", 0.65);
-    const sections = [['01','Context','Why we exist · What\'s broken'],['02','Positioning','The statement · The pitch · Core term'],['03','Audience','Archetypes · Psychographics · Who we\'re not for'],['04','Brand Core','Purpose · Mission · Vision · Values · Voice'],['05','Differentiation','Elevator pitch · Us vs. them · Messaging hierarchy'],['06','Visual Direction','Palette · Typography · Mood'],['07','The Model','Services · Engagement · Guardrails']];
-    const colW = (W-1.2)/2;
-    sections.forEach((sec,i) => {
-      const col=i<4?0:1, row=i<4?i:i-4, x=0.5+col*(colW+0.2), y=1.7+row*1.1;
-      s.addShape(pres.shapes.RECTANGLE, { x, y, w:colW, h:0.95, fill:{ color:C.cream }, line:{ color:C.border, width:1 } });
-      s.addText(sec[0], { x:x+0.14, y:y+0.12, w:0.6,      h:0.35, fontSize:11, fontFace:F.head, color:C.accent, bold:false });
-      s.addText(sec[1], { x:x+0.14, y:y+0.34, w:colW-0.3, h:0.3,  fontSize:14, fontFace:F.head, color:C.dark,   bold:false });
-      s.addText(sec[2], { x:x+0.14, y:y+0.6,  w:colW-0.3, h:0.28, fontSize:10, fontFace:F.body, color:C.muted });
+  // TOC
+  { const s = contentSlide(); addSectionHeader(s,'CONTENTS'); addPageTitle(s,"What's Inside",0.65);
+    const sections=[['01','Context','Why we exist · What\'s broken'],['02','Positioning','The statement · The pitch · Core term'],['03','Audience','Archetypes · Psychographics · Who we\'re not for'],['04','Brand Core','Purpose · Mission · Vision · Values · Voice'],['05','Differentiation','Elevator pitch · Us vs. them · Messaging hierarchy'],['06','Visual Direction','Palette · Typography · Mood'],['07','The Model','Services · Engagement · Guardrails']];
+    const colW=(W-1.2)/2;
+    sections.forEach((sec,i)=>{ const col=i<4?0:1,row=i<4?i:i-4,x=0.5+col*(colW+0.2),y=1.7+row*1.1;
+      s.addShape(pres.shapes.RECTANGLE,{x,y,w:colW,h:0.95,fill:{color:C.cream},line:{color:C.border,width:1}});
+      s.addText(sec[0],{x:x+0.14,y:y+0.12,w:0.6,h:0.35,fontSize:11,fontFace:F.head,color:C.accent,bold:false});
+      s.addText(sec[1],{x:x+0.14,y:y+0.34,w:colW-0.3,h:0.3,fontSize:14,fontFace:F.head,color:C.dark,bold:false});
+      s.addText(sec[2],{x:x+0.14,y:y+0.6,w:colW-0.3,h:0.28,fontSize:10,fontFace:F.body,color:C.muted});
     });
   }
 
   sectionSlide('01','Context');
-  { const s = contentSlide(); addSectionHeader(s,'CONTEXT · WHY WE EXIST'); addPageTitle(s,`Why ${d.brand_name} Exists`);
-    s.addShape(pres.shapes.RECTANGLE, { x:0.5, y:1.55, w:4.5, h:2.8, fill:{ color:C.dark } });
-    s.addText('OUR BELIEF', { x:0.72, y:1.75, w:4, h:0.3, fontSize:10, fontFace:F.body, color:C.accent, charSpacing:4 });
-    s.addText(d.context?.core_belief||'', { x:0.72, y:2.15, w:4.1, h:2.0, fontSize:16, fontFace:F.head, color:C.cream, italic:true, valign:'top', lineSpacingMultiple:1.3 });
-    s.addText(d.context?.why_exists||'', { x:5.4, y:1.55, w:7.4, h:2.8, fontSize:14, fontFace:F.body, color:C.dark, valign:'top', lineSpacingMultiple:1.55 });
+  { const s=contentSlide(); addSectionHeader(s,'CONTEXT · WHY WE EXIST'); addPageTitle(s,`Why ${d.brand_name} Exists`);
+    s.addShape(pres.shapes.RECTANGLE,{x:0.5,y:1.55,w:4.5,h:2.8,fill:{color:C.dark}});
+    s.addText('OUR BELIEF',{x:0.72,y:1.75,w:4,h:0.3,fontSize:10,fontFace:F.body,color:C.accent,charSpacing:4});
+    s.addText(d.context?.core_belief||'',{x:0.72,y:2.15,w:4.1,h:2.0,fontSize:16,fontFace:F.head,color:C.cream,italic:true,valign:'top',lineSpacingMultiple:1.3});
+    s.addText(d.context?.why_exists||'',{x:5.4,y:1.55,w:7.4,h:2.8,fontSize:14,fontFace:F.body,color:C.dark,valign:'top',lineSpacingMultiple:1.55});
   }
-  { const s = contentSlide({ bg:C.cream }); addSectionHeader(s,'CONTEXT · THE MARKET PROBLEM'); addPageTitle(s,"What's Broken?");
-    s.addText(d.context?.market_problem||'', { x:0.5, y:1.55, w:8, h:1.2, fontSize:14, fontFace:F.body, color:C.dark, lineSpacingMultiple:1.55 });
-    s.addShape(pres.shapes.RECTANGLE, { x:8.8, y:1.4, w:4.0, h:3.5, fill:{ color:C.accent } });
-    s.addText('Activity\n≠\nProgress.', { x:8.8, y:1.8, w:4.0, h:3.0, fontSize:36, fontFace:F.head, color:C.white, align:'center', valign:'middle', lineSpacingMultiple:1.4 });
+  { const s=contentSlide({bg:C.cream}); addSectionHeader(s,'CONTEXT · THE MARKET PROBLEM'); addPageTitle(s,"What's Broken?");
+    s.addText(d.context?.market_problem||'',{x:0.5,y:1.55,w:8,h:1.2,fontSize:14,fontFace:F.body,color:C.dark,lineSpacingMultiple:1.55});
+    s.addShape(pres.shapes.RECTANGLE,{x:8.8,y:1.4,w:4.0,h:3.5,fill:{color:C.accent}});
+    s.addText('Activity\n≠\nProgress.',{x:8.8,y:1.8,w:4.0,h:3.0,fontSize:36,fontFace:F.head,color:C.white,align:'center',valign:'middle',lineSpacingMultiple:1.4});
   }
 
   sectionSlide('02','Positioning');
-  { const s = contentSlide(); addSectionHeader(s,'POSITIONING · THE STATEMENT'); addPageTitle(s,'Positioning Statement');
-    s.addShape(pres.shapes.RECTANGLE, { x:0.5, y:1.55, w:W-1, h:2.1, fill:{ color:C.cream }, line:{ color:C.border, width:1 } });
-    s.addText(d.positioning?.statement||'', { x:0.85, y:1.75, w:W-1.8, h:1.8, fontSize:20, fontFace:F.head, color:C.dark, italic:true, valign:'middle', lineSpacingMultiple:1.4 });
-    s.addText('CORE TERM', { x:0.5, y:3.85, w:3, h:0.3, fontSize:10, fontFace:F.body, color:C.muted, charSpacing:4 });
-    s.addShape(pres.shapes.RECTANGLE, { x:0.5, y:4.18, w:5.5, h:0.7, fill:{ color:C.accent } });
-    s.addText(d.positioning?.core_term||'', { x:0.65, y:4.18, w:5.2, h:0.7, fontSize:18, fontFace:F.head, color:C.white, valign:'middle' });
-    s.addText('5 WORDS', { x:7, y:3.85, w:6, h:0.3, fontSize:10, fontFace:F.body, color:C.muted, charSpacing:4 });
-    s.addText(d.positioning?.five_words||'', { x:7, y:4.18, w:5.8, h:0.7, fontSize:18, fontFace:F.head, color:C.dark, italic:true, valign:'middle' });
+  { const s=contentSlide(); addSectionHeader(s,'POSITIONING · THE STATEMENT'); addPageTitle(s,'Positioning Statement');
+    s.addShape(pres.shapes.RECTANGLE,{x:0.5,y:1.55,w:W-1,h:2.1,fill:{color:C.cream},line:{color:C.border,width:1}});
+    s.addText(d.positioning?.statement||'',{x:0.85,y:1.75,w:W-1.8,h:1.8,fontSize:20,fontFace:F.head,color:C.dark,italic:true,valign:'middle',lineSpacingMultiple:1.4});
+    s.addText('CORE TERM',{x:0.5,y:3.85,w:3,h:0.3,fontSize:10,fontFace:F.body,color:C.muted,charSpacing:4});
+    s.addShape(pres.shapes.RECTANGLE,{x:0.5,y:4.18,w:5.5,h:0.7,fill:{color:C.accent}});
+    s.addText(d.positioning?.core_term||'',{x:0.65,y:4.18,w:5.2,h:0.7,fontSize:18,fontFace:F.head,color:C.white,valign:'middle'});
+    s.addText('5 WORDS',{x:7,y:3.85,w:6,h:0.3,fontSize:10,fontFace:F.body,color:C.muted,charSpacing:4});
+    s.addText(d.positioning?.five_words||'',{x:7,y:4.18,w:5.8,h:0.7,fontSize:18,fontFace:F.head,color:C.dark,italic:true,valign:'middle'});
   }
-  { const s = contentSlide({ bg:C.cream }); addSectionHeader(s,'POSITIONING · ELEVATOR PITCH'); addPageTitle(s,'The Pitch');
-    s.addShape(pres.shapes.RECTANGLE, { x:0.5, y:1.55, w:W-1, h:0.06, fill:{ color:C.accent } });
-    s.addText('WORKING PRIMARY', { x:0.5, y:1.75, w:4, h:0.3, fontSize:10, fontFace:F.body, color:C.muted, charSpacing:4 });
-    s.addText(d.positioning?.elevator_pitch||'', { x:0.5, y:2.1, w:W-1.2, h:1.3, fontSize:20, fontFace:F.head, color:C.dark, lineSpacingMultiple:1.4 });
-    s.addShape(pres.shapes.RECTANGLE, { x:0.5, y:3.6, w:W-1, h:0.01, fill:{ color:C.border } });
-    s.addText('IN A REAL CONVERSATION', { x:0.5, y:3.75, w:6, h:0.3, fontSize:10, fontFace:F.body, color:C.muted, charSpacing:4 });
-    s.addText(d.differentiation?.messaging?.elevator||d.positioning?.elevator_pitch||'', { x:0.5, y:4.1, w:W-1.2, h:1.5, fontSize:14, fontFace:F.body, color:C.dark, lineSpacingMultiple:1.55 });
+  { const s=contentSlide({bg:C.cream}); addSectionHeader(s,'POSITIONING · ELEVATOR PITCH'); addPageTitle(s,'The Pitch');
+    s.addShape(pres.shapes.RECTANGLE,{x:0.5,y:1.55,w:W-1,h:0.06,fill:{color:C.accent}});
+    s.addText('WORKING PRIMARY',{x:0.5,y:1.75,w:4,h:0.3,fontSize:10,fontFace:F.body,color:C.muted,charSpacing:4});
+    s.addText(d.positioning?.elevator_pitch||'',{x:0.5,y:2.1,w:W-1.2,h:1.3,fontSize:20,fontFace:F.head,color:C.dark,lineSpacingMultiple:1.4});
+    s.addShape(pres.shapes.RECTANGLE,{x:0.5,y:3.6,w:W-1,h:0.01,fill:{color:C.border}});
+    s.addText('IN A REAL CONVERSATION',{x:0.5,y:3.75,w:6,h:0.3,fontSize:10,fontFace:F.body,color:C.muted,charSpacing:4});
+    s.addText(d.differentiation?.messaging?.elevator||d.positioning?.elevator_pitch||'',{x:0.5,y:4.1,w:W-1.2,h:1.5,fontSize:14,fontFace:F.body,color:C.dark,lineSpacingMultiple:1.55});
   }
 
   sectionSlide('03','Audience');
-  { const s = contentSlide(); addSectionHeader(s,'AUDIENCE · CLIENT ARCHETYPES'); addPageTitle(s,'Three Kinds of Clients We\'re Built For');
-    const archetypes = [d.audience?.archetype_1, d.audience?.archetype_2, d.audience?.archetype_3].filter(Boolean);
-    const cw = (W-0.8)/3;
-    archetypes.forEach((a,i) => {
-      const x=0.4+i*(cw+0.1), tc=i===1?C.cream:C.dark, tm=i===1?'E0D8CE':C.muted;
-      s.addShape(pres.shapes.RECTANGLE, { x, y:1.55, w:cw, h:5.4, fill:{ color:i===1?C.dark:C.cream }, line:{ color:C.border, width:1 } });
-      s.addShape(pres.shapes.RECTANGLE, { x, y:1.55, w:cw, h:0.07, fill:{ color:C.accent } });
-      s.addText((a.name||'').toUpperCase(), { x:x+0.16, y:1.72, w:cw-0.3, h:0.35, fontSize:11, fontFace:F.head, color:C.accent, charSpacing:2 });
-      s.addText(a.role||'',    { x:x+0.16, y:2.05, w:cw-0.3, h:0.35, fontSize:9,  fontFace:F.body, color:tm });
-      s.addText('CONTEXT',     { x:x+0.16, y:2.5,  w:cw-0.3, h:0.25, fontSize:8,  fontFace:F.body, color:C.accent, charSpacing:3 });
-      s.addText(a.context||'', { x:x+0.16, y:2.72, w:cw-0.3, h:1.0,  fontSize:11, fontFace:F.body, color:tc, lineSpacingMultiple:1.4 });
-      s.addText('TENSION',     { x:x+0.16, y:3.82, w:cw-0.3, h:0.25, fontSize:8,  fontFace:F.body, color:C.accent, charSpacing:3 });
-      s.addText(a.tension||'', { x:x+0.16, y:4.04, w:cw-0.3, h:0.8,  fontSize:11, fontFace:F.body, color:tc, lineSpacingMultiple:1.4, italic:true });
-      s.addText('TRIGGER',     { x:x+0.16, y:4.94, w:cw-0.3, h:0.25, fontSize:8,  fontFace:F.body, color:C.accent, charSpacing:3 });
-      s.addText(a.trigger||'', { x:x+0.16, y:5.16, w:cw-0.3, h:0.65, fontSize:11, fontFace:F.body, color:tc, lineSpacingMultiple:1.4 });
+  { const s=contentSlide(); addSectionHeader(s,'AUDIENCE · CLIENT ARCHETYPES'); addPageTitle(s,'Three Kinds of Clients We\'re Built For');
+    const archetypes=[d.audience?.archetype_1,d.audience?.archetype_2,d.audience?.archetype_3].filter(Boolean);
+    const cw=(W-0.8)/3;
+    archetypes.forEach((a,i)=>{ const x=0.4+i*(cw+0.1),tc=i===1?C.cream:C.dark,tm=i===1?'E0D8CE':C.muted;
+      s.addShape(pres.shapes.RECTANGLE,{x,y:1.55,w:cw,h:5.4,fill:{color:i===1?C.dark:C.cream},line:{color:C.border,width:1}});
+      s.addShape(pres.shapes.RECTANGLE,{x,y:1.55,w:cw,h:0.07,fill:{color:C.accent}});
+      s.addText((a.name||'').toUpperCase(),{x:x+0.16,y:1.72,w:cw-0.3,h:0.35,fontSize:11,fontFace:F.head,color:C.accent,charSpacing:2});
+      s.addText(a.role||'',{x:x+0.16,y:2.05,w:cw-0.3,h:0.35,fontSize:9,fontFace:F.body,color:tm});
+      s.addText('CONTEXT',{x:x+0.16,y:2.5,w:cw-0.3,h:0.25,fontSize:8,fontFace:F.body,color:C.accent,charSpacing:3});
+      s.addText(a.context||'',{x:x+0.16,y:2.72,w:cw-0.3,h:1.0,fontSize:11,fontFace:F.body,color:tc,lineSpacingMultiple:1.4});
+      s.addText('TENSION',{x:x+0.16,y:3.82,w:cw-0.3,h:0.25,fontSize:8,fontFace:F.body,color:C.accent,charSpacing:3});
+      s.addText(a.tension||'',{x:x+0.16,y:4.04,w:cw-0.3,h:0.8,fontSize:11,fontFace:F.body,color:tc,lineSpacingMultiple:1.4,italic:true});
+      s.addText('TRIGGER',{x:x+0.16,y:4.94,w:cw-0.3,h:0.25,fontSize:8,fontFace:F.body,color:C.accent,charSpacing:3});
+      s.addText(a.trigger||'',{x:x+0.16,y:5.16,w:cw-0.3,h:0.65,fontSize:11,fontFace:F.body,color:tc,lineSpacingMultiple:1.4});
     });
   }
-  { const s = contentSlide({ bg:C.cream }); addSectionHeader(s,"AUDIENCE · WHO WE'RE NOT FOR"); addPageTitle(s,'Not everyone is the right fit.\nThat\'s by design.');
-    const notFor=d.audience?.not_for||[], cw=(W-0.8)/Math.max(notFor.length,1);
-    notFor.forEach((item,i) => {
-      const x=0.4+i*(cw+0.1), parts=item.split(' — '), heading=parts[0]||item, body=parts[1]||'';
-      s.addShape(pres.shapes.RECTANGLE, { x, y:1.9, w:cw-0.1, h:3.8, fill:{ color:C.white }, line:{ color:C.border, width:1 } });
-      s.addText('✕', { x:x+0.2, y:2.1, w:0.4, h:0.4, fontSize:18, fontFace:F.body, color:C.accent });
-      s.addText(heading, { x:x+0.2, y:2.55, w:cw-0.5, h:0.4, fontSize:13, fontFace:F.head, color:C.dark, bold:false });
-      if (body) s.addText(body, { x:x+0.2, y:3.0, w:cw-0.5, h:2.5, fontSize:11, fontFace:F.body, color:C.muted, lineSpacingMultiple:1.5 });
+  { const s=contentSlide({bg:C.cream}); addSectionHeader(s,"AUDIENCE · WHO WE'RE NOT FOR"); addPageTitle(s,'Not everyone is the right fit.\nThat\'s by design.');
+    const notFor=d.audience?.not_for||[],cw=(W-0.8)/Math.max(notFor.length,1);
+    notFor.forEach((item,i)=>{ const x=0.4+i*(cw+0.1),parts=item.split(' — '),heading=parts[0]||item,body=parts[1]||'';
+      s.addShape(pres.shapes.RECTANGLE,{x,y:1.9,w:cw-0.1,h:3.8,fill:{color:C.white},line:{color:C.border,width:1}});
+      s.addText('✕',{x:x+0.2,y:2.1,w:0.4,h:0.4,fontSize:18,fontFace:F.body,color:C.accent});
+      s.addText(heading,{x:x+0.2,y:2.55,w:cw-0.5,h:0.4,fontSize:13,fontFace:F.head,color:C.dark,bold:false});
+      if(body)s.addText(body,{x:x+0.2,y:3.0,w:cw-0.5,h:2.5,fontSize:11,fontFace:F.body,color:C.muted,lineSpacingMultiple:1.5});
     });
   }
 
   sectionSlide('04','Brand Core');
-  { const s = contentSlide(); addSectionHeader(s,'BRAND CORE · PURPOSE · MISSION · VISION');
-    [{ label:'PURPOSE', sub:'Why we exist long-term', text:d.brand_core?.purpose||'' },{ label:'MISSION', sub:'What we do every day', text:d.brand_core?.mission||'' },{ label:'VISION', sub:"Where we're headed", text:d.brand_core?.vision||'' }].forEach((item,i) => {
-      const y=0.65+i*2.1;
-      s.addShape(pres.shapes.RECTANGLE, { x:0.5, y, w:0.06, h:1.5, fill:{ color:C.accent } });
-      s.addText(item.label, { x:0.72, y:y+0.05, w:3,     h:0.28, fontSize:10, fontFace:F.body, color:C.accent, charSpacing:4 });
-      s.addText(item.sub,   { x:0.72, y:y+0.33, w:5,     h:0.25, fontSize:10, fontFace:F.body, color:C.muted });
-      s.addText(item.text,  { x:0.72, y:y+0.6,  w:W-1.4, h:1.0,  fontSize:14, fontFace:F.body, color:C.dark, lineSpacingMultiple:1.5 });
+  { const s=contentSlide(); addSectionHeader(s,'BRAND CORE · PURPOSE · MISSION · VISION');
+    [{label:'PURPOSE',sub:'Why we exist long-term',text:d.brand_core?.purpose||''},{label:'MISSION',sub:'What we do every day',text:d.brand_core?.mission||''},{label:'VISION',sub:"Where we're headed",text:d.brand_core?.vision||''}].forEach((item,i)=>{ const y=0.65+i*2.1;
+      s.addShape(pres.shapes.RECTANGLE,{x:0.5,y,w:0.06,h:1.5,fill:{color:C.accent}});
+      s.addText(item.label,{x:0.72,y:y+0.05,w:3,h:0.28,fontSize:10,fontFace:F.body,color:C.accent,charSpacing:4});
+      s.addText(item.sub,  {x:0.72,y:y+0.33,w:5,h:0.25,fontSize:10,fontFace:F.body,color:C.muted});
+      s.addText(item.text, {x:0.72,y:y+0.6, w:W-1.4,h:1.0,fontSize:14,fontFace:F.body,color:C.dark,lineSpacingMultiple:1.5});
     });
   }
-  { const s = contentSlide({ bg:C.cream }); addSectionHeader(s,'BRAND CORE · VALUES'); addPageTitle(s,'The Values That Drive Every Decision');
-    const values=(d.brand_core?.values||[]).slice(0,4), cw=(W-0.8)/2;
-    values.forEach((v,i) => {
-      const col=i%2, row=Math.floor(i/2), x=0.4+col*(cw+0.1), y=1.65+row*2.55;
-      s.addShape(pres.shapes.RECTANGLE, { x, y, w:cw-0.1, h:2.35, fill:{ color:C.white }, line:{ color:C.border, width:1 } });
-      s.addShape(pres.shapes.RECTANGLE, { x, y, w:0.06, h:2.35, fill:{ color:C.accent } });
-      s.addText(v.name||'',        { x:x+0.22, y:y+0.2,  w:cw-0.5, h:0.4, fontSize:16, fontFace:F.head, color:C.dark, bold:false });
-      s.addText(v.description||'', { x:x+0.22, y:y+0.65, w:cw-0.5, h:1.5, fontSize:12, fontFace:F.body, color:C.muted, lineSpacingMultiple:1.5 });
+  { const s=contentSlide({bg:C.cream}); addSectionHeader(s,'BRAND CORE · VALUES'); addPageTitle(s,'The Values That Drive Every Decision');
+    const values=(d.brand_core?.values||[]).slice(0,4),cw=(W-0.8)/2;
+    values.forEach((v,i)=>{ const col=i%2,row=Math.floor(i/2),x=0.4+col*(cw+0.1),y=1.65+row*2.55;
+      s.addShape(pres.shapes.RECTANGLE,{x,y,w:cw-0.1,h:2.35,fill:{color:C.white},line:{color:C.border,width:1}});
+      s.addShape(pres.shapes.RECTANGLE,{x,y,w:0.06,h:2.35,fill:{color:C.accent}});
+      s.addText(v.name||'',       {x:x+0.22,y:y+0.2, w:cw-0.5,h:0.4,fontSize:16,fontFace:F.head,color:C.dark,bold:false});
+      s.addText(v.description||'',{x:x+0.22,y:y+0.65,w:cw-0.5,h:1.5,fontSize:12,fontFace:F.body,color:C.muted,lineSpacingMultiple:1.5});
     });
   }
-  { const s = contentSlide(); addSectionHeader(s,'BRAND CORE · PERSONALITY + VOICE'); addPageTitle(s,'How We Feel & How We Sound');
-    s.addText('PERSONALITY', { x:0.5, y:1.6, w:5, h:0.3, fontSize:10, fontFace:F.body, color:C.muted, charSpacing:4 });
-    (d.brand_core?.personality_traits||[]).slice(0,6).forEach((t,i) => {
-      const row=Math.floor(i/2), col=i%2, x=0.5+col*2.9, y=2.0+row*0.6;
-      s.addShape(pres.shapes.RECTANGLE, { x, y, w:2.6, h:0.42, fill:{ color:C.cream }, line:{ color:C.border, width:1 } });
-      s.addText(t, { x:x+0.14, y, w:2.3, h:0.42, fontSize:13, fontFace:F.head, color:C.dark, valign:'middle' });
+  { const s=contentSlide(); addSectionHeader(s,'BRAND CORE · PERSONALITY + VOICE'); addPageTitle(s,'How We Feel & How We Sound');
+    s.addText('PERSONALITY',{x:0.5,y:1.6,w:5,h:0.3,fontSize:10,fontFace:F.body,color:C.muted,charSpacing:4});
+    (d.brand_core?.personality_traits||[]).slice(0,6).forEach((t,i)=>{ const row=Math.floor(i/2),col=i%2,x=0.5+col*2.9,y=2.0+row*0.6;
+      s.addShape(pres.shapes.RECTANGLE,{x,y,w:2.6,h:0.42,fill:{color:C.cream},line:{color:C.border,width:1}});
+      s.addText(t,{x:x+0.14,y,w:2.3,h:0.42,fontSize:13,fontFace:F.head,color:C.dark,valign:'middle'});
     });
-    s.addShape(pres.shapes.RECTANGLE, { x:6.5, y:1.55, w:6.3, h:5.4, fill:{ color:C.dark } });
-    s.addText('TONE OF VOICE', { x:6.8, y:1.8, w:5.7, h:0.3, fontSize:10, fontFace:F.body, color:C.accent, charSpacing:4 });
-    s.addText(d.brand_core?.voice_description||'', { x:6.8, y:2.2, w:5.7, h:4.5, fontSize:14, fontFace:F.body, color:C.cream, lineSpacingMultiple:1.6, valign:'top' });
+    s.addShape(pres.shapes.RECTANGLE,{x:6.5,y:1.55,w:6.3,h:5.4,fill:{color:C.dark}});
+    s.addText('TONE OF VOICE',{x:6.8,y:1.8,w:5.7,h:0.3,fontSize:10,fontFace:F.body,color:C.accent,charSpacing:4});
+    s.addText(d.brand_core?.voice_description||'',{x:6.8,y:2.2,w:5.7,h:4.5,fontSize:14,fontFace:F.body,color:C.cream,lineSpacingMultiple:1.6,valign:'top'});
   }
 
   sectionSlide('05','Differentiation');
-  { const s = contentSlide({ bg:C.cream }); addSectionHeader(s,"DIFFERENTIATION · US VS. THEM"); addPageTitle(s,"How We're Actually Different");
-    s.addText('TYPICAL', { x:0.5, y:1.65, w:6, h:0.35, fontSize:11, fontFace:F.body, color:C.muted, charSpacing:3 });
-    s.addText((d.brand_name||'').toUpperCase(), { x:7.2, y:1.65, w:5.6, h:0.35, fontSize:11, fontFace:F.body, color:C.accent, charSpacing:3 });
-    (d.differentiation?.comparisons||[]).slice(0,5).forEach((c,i) => {
-      const y=2.1+i*0.98, bg=i%2===0?C.white:C.cream;
-      s.addShape(pres.shapes.RECTANGLE, { x:0.4, y, w:6.5, h:0.82, fill:{ color:bg }, line:{ color:C.border, width:1 } });
-      s.addShape(pres.shapes.RECTANGLE, { x:6.9, y, w:6.0, h:0.82, fill:{ color:C.dark } });
-      s.addShape(pres.shapes.RECTANGLE, { x:6.4, y:y+0.18, w:0.5, h:0.46, fill:{ color:C.accent } });
-      s.addText(c.them||'', { x:0.65, y, w:6.1, h:0.82, fontSize:12, fontFace:F.body, color:C.muted, valign:'middle' });
-      s.addText(c.us||'',   { x:7.1,  y, w:5.6, h:0.82, fontSize:12, fontFace:F.body, color:C.cream, valign:'middle' });
+  { const s=contentSlide({bg:C.cream}); addSectionHeader(s,"DIFFERENTIATION · US VS. THEM"); addPageTitle(s,"How We're Actually Different");
+    s.addText('TYPICAL',{x:0.5,y:1.65,w:6,h:0.35,fontSize:11,fontFace:F.body,color:C.muted,charSpacing:3});
+    s.addText((d.brand_name||'').toUpperCase(),{x:7.2,y:1.65,w:5.6,h:0.35,fontSize:11,fontFace:F.body,color:C.accent,charSpacing:3});
+    (d.differentiation?.comparisons||[]).slice(0,5).forEach((c,i)=>{ const y=2.1+i*0.98,bg=i%2===0?C.white:C.cream;
+      s.addShape(pres.shapes.RECTANGLE,{x:0.4,y,w:6.5,h:0.82,fill:{color:bg},line:{color:C.border,width:1}});
+      s.addShape(pres.shapes.RECTANGLE,{x:6.9,y,w:6.0,h:0.82,fill:{color:C.dark}});
+      s.addShape(pres.shapes.RECTANGLE,{x:6.4,y:y+0.18,w:0.5,h:0.46,fill:{color:C.accent}});
+      s.addText(c.them||'',{x:0.65,y,w:6.1,h:0.82,fontSize:12,fontFace:F.body,color:C.muted,valign:'middle'});
+      s.addText(c.us||'',  {x:7.1, y,w:5.6,h:0.82,fontSize:12,fontFace:F.body,color:C.cream,valign:'middle'});
     });
   }
-  { const s = contentSlide(); addSectionHeader(s,'DIFFERENTIATION · MESSAGING HIERARCHY'); addPageTitle(s,'What to Say, When');
-    [{ num:'01', label:'TAGLINE', text:d.differentiation?.messaging?.tagline||d.tagline||'' },{ num:'02', label:'BRAND STATEMENT', text:d.differentiation?.messaging?.brand_statement||'' },{ num:'03', label:'ELEVATOR PITCH', text:d.differentiation?.messaging?.elevator||'' },{ num:'04', label:'SERVICE PROOF POINT', text:d.differentiation?.messaging?.proof_point||'' }].forEach((lv,i) => {
-      const y=1.55+i*1.3, tc=i===0?C.cream:C.dark, tm=i===0?'D0C8C0':C.muted;
-      s.addShape(pres.shapes.RECTANGLE, { x:0.5, y, w:W-1, h:1.1, fill:{ color:i===0?C.dark:C.cream }, line:{ color:C.border, width:1 } });
-      s.addText(lv.num,   { x:0.7, y:y+0.1,  w:0.6,   h:0.35, fontSize:14, fontFace:F.head, color:C.accent });
-      s.addText(lv.label, { x:1.3, y:y+0.1,  w:3.5,   h:0.28, fontSize:9,  fontFace:F.body, color:tm, charSpacing:3 });
-      s.addText(lv.text,  { x:1.3, y:y+0.42, w:W-2.2, h:0.55, fontSize:13, fontFace:F.body, color:tc, lineSpacingMultiple:1.4 });
+  { const s=contentSlide(); addSectionHeader(s,'DIFFERENTIATION · MESSAGING HIERARCHY'); addPageTitle(s,'What to Say, When');
+    [{num:'01',label:'TAGLINE',text:d.differentiation?.messaging?.tagline||d.tagline||''},{num:'02',label:'BRAND STATEMENT',text:d.differentiation?.messaging?.brand_statement||''},{num:'03',label:'ELEVATOR PITCH',text:d.differentiation?.messaging?.elevator||''},{num:'04',label:'SERVICE PROOF POINT',text:d.differentiation?.messaging?.proof_point||''}].forEach((lv,i)=>{ const y=1.55+i*1.3,tc=i===0?C.cream:C.dark,tm=i===0?'D0C8C0':C.muted;
+      s.addShape(pres.shapes.RECTANGLE,{x:0.5,y,w:W-1,h:1.1,fill:{color:i===0?C.dark:C.cream},line:{color:C.border,width:1}});
+      s.addText(lv.num,  {x:0.7,y:y+0.1, w:0.6,  h:0.35,fontSize:14,fontFace:F.head,color:C.accent});
+      s.addText(lv.label,{x:1.3,y:y+0.1, w:3.5,  h:0.28,fontSize:9, fontFace:F.body,color:tm,charSpacing:3});
+      s.addText(lv.text, {x:1.3,y:y+0.42,w:W-2.2,h:0.55,fontSize:13,fontFace:F.body,color:tc,lineSpacingMultiple:1.4});
     });
   }
 
   sectionSlide('06','Visual Direction');
-  { const s = contentSlide({ bg:C.cream }); addSectionHeader(s,'VISUAL DIRECTION'); addPageTitle(s,'The Look & Feel');
+  { const s=contentSlide({bg:C.cream}); addSectionHeader(s,'VISUAL DIRECTION'); addPageTitle(s,'The Look & Feel');
     const mood=d.visual?.mood_words||[];
-    s.addText('PALETTE', { x:0.5, y:1.6, w:4, h:0.28, fontSize:10, fontFace:F.body, color:C.muted, charSpacing:4 });
-    [{ color:C.dark, label:'Primary' },{ color:C.mid, label:'Secondary' },{ color:C.accent, label:'Accent' },{ color:C.cream, label:'Background' }].forEach((sw,i) => {
-      const x=0.5+i*1.65;
-      s.addShape(pres.shapes.RECTANGLE, { x, y:1.95, w:1.5, h:1.0, fill:{ color:sw.color }, line:{ color:C.border, width:1 } });
-      s.addText(sw.label,    { x, y:3.02, w:1.5, h:0.28, fontSize:9, fontFace:F.body, color:C.muted, align:'center' });
-      s.addText('#'+sw.color,{ x, y:3.28, w:1.5, h:0.25, fontSize:9, fontFace:F.body, color:C.muted, align:'center', transparency:30 });
+    s.addText('PALETTE',{x:0.5,y:1.6,w:4,h:0.28,fontSize:10,fontFace:F.body,color:C.muted,charSpacing:4});
+    [{color:C.dark,label:'Primary'},{color:C.mid,label:'Secondary'},{color:C.accent,label:'Accent'},{color:C.cream,label:'Background'}].forEach((sw,i)=>{ const x=0.5+i*1.65;
+      s.addShape(pres.shapes.RECTANGLE,{x,y:1.95,w:1.5,h:1.0,fill:{color:sw.color},line:{color:C.border,width:1}});
+      s.addText(sw.label,   {x,y:3.02,w:1.5,h:0.28,fontSize:9,fontFace:F.body,color:C.muted,align:'center'});
+      s.addText('#'+sw.color,{x,y:3.28,w:1.5,h:0.25,fontSize:9,fontFace:F.body,color:C.muted,align:'center',transparency:30});
     });
-    s.addText(d.visual?.palette_description||'', { x:0.5, y:3.65, w:7, h:0.9, fontSize:13, fontFace:F.body, color:C.dark, lineSpacingMultiple:1.5 });
-
-    s.addText('TYPOGRAPHY', { x:7.8, y:1.6, w:5, h:0.28, fontSize:10, fontFace:F.body, color:C.muted, charSpacing:4 });
-    s.addShape(pres.shapes.RECTANGLE, { x:7.8, y:1.95, w:5.0, h:1.5, fill:{ color:C.white }, line:{ color:C.border, width:1 } });
-    s.addText('HEADING', { x:8.0, y:2.05, w:4.5, h:0.25, fontSize:9, fontFace:F.body, color:C.muted, charSpacing:3 });
-    s.addText(d.visual?.font_heading || 'Cormorant Garamond', { x:8.0, y:2.28, w:4.5, h:0.45, fontSize:20, fontFace:F.head, color:C.dark });
-    s.addText('BODY', { x:8.0, y:2.78, w:4.5, h:0.25, fontSize:9, fontFace:F.body, color:C.muted, charSpacing:3 });
-    s.addText(d.visual?.font_body || 'DM Sans', { x:8.0, y:3.01, w:4.5, h:0.35, fontSize:15, fontFace:F.body, color:C.dark });
-
-    s.addText('MOOD', { x:7.8, y:3.6, w:5, h:0.28, fontSize:10, fontFace:F.body, color:C.muted, charSpacing:4 });
-    mood.forEach((m,i) => {
-      const x=7.8+(i%2)*2.55, y=3.95+Math.floor(i/2)*0.52;
-      s.addShape(pres.shapes.RECTANGLE, { x, y, w:2.35, h:0.38, fill:{ color:C.dark } });
-      s.addText(m, { x, y, w:2.35, h:0.38, fontSize:12, fontFace:F.head, color:C.cream, align:'center', valign:'middle', italic:true });
+    s.addText(d.visual?.palette_description||'',{x:0.5,y:3.65,w:7,h:0.9,fontSize:13,fontFace:F.body,color:C.dark,lineSpacingMultiple:1.5});
+    s.addText('TYPOGRAPHY',{x:7.8,y:1.6,w:5,h:0.28,fontSize:10,fontFace:F.body,color:C.muted,charSpacing:4});
+    s.addShape(pres.shapes.RECTANGLE,{x:7.8,y:1.95,w:5.0,h:1.5,fill:{color:C.white},line:{color:C.border,width:1}});
+    s.addText('HEADING',{x:8.0,y:2.05,w:4.5,h:0.25,fontSize:9,fontFace:F.body,color:C.muted,charSpacing:3});
+    s.addText(d.visual?.font_heading||'Cormorant Garamond',{x:8.0,y:2.28,w:4.5,h:0.45,fontSize:20,fontFace:F.head,color:C.dark});
+    s.addText('BODY',{x:8.0,y:2.78,w:4.5,h:0.25,fontSize:9,fontFace:F.body,color:C.muted,charSpacing:3});
+    s.addText(d.visual?.font_body||'DM Sans',{x:8.0,y:3.01,w:4.5,h:0.35,fontSize:15,fontFace:F.body,color:C.dark});
+    s.addText('MOOD',{x:7.8,y:3.6,w:5,h:0.28,fontSize:10,fontFace:F.body,color:C.muted,charSpacing:4});
+    mood.forEach((m,i)=>{ const x=7.8+(i%2)*2.55,y=3.95+Math.floor(i/2)*0.52;
+      s.addShape(pres.shapes.RECTANGLE,{x,y,w:2.35,h:0.38,fill:{color:C.dark}});
+      s.addText(m,{x,y,w:2.35,h:0.38,fontSize:12,fontFace:F.head,color:C.cream,align:'center',valign:'middle',italic:true});
     });
-
     const refs=(d.visual?.brand_references||[]).filter(Boolean);
-    if (refs.length) {
-      s.addText('BRAND REFERENCES', { x:0.5, y:4.7, w:7, h:0.28, fontSize:10, fontFace:F.body, color:C.muted, charSpacing:4 });
-      s.addText(refs.join('  ·  '), { x:0.5, y:5.0, w:12.3, h:0.5, fontSize:14, fontFace:F.head, color:C.dark, italic:true });
-    }
+    if(refs.length){ s.addText('BRAND REFERENCES',{x:0.5,y:4.7,w:7,h:0.28,fontSize:10,fontFace:F.body,color:C.muted,charSpacing:4}); s.addText(refs.join('  ·  '),{x:0.5,y:5.0,w:12.3,h:0.5,fontSize:14,fontFace:F.head,color:C.dark,italic:true}); }
   }
 
   sectionSlide('07','The Model');
-  { const s = contentSlide({ bg:C.cream }); addSectionHeader(s,'THE MODEL · SERVICES + CAPABILITIES'); addPageTitle(s,'Services & Capabilities');
-    const services=(d.model?.services||[]).slice(0,6), cols=3, cw=(W-0.8)/cols;
-    services.forEach((svc,i) => {
-      const col=i%cols, row=Math.floor(i/cols), x=0.4+col*(cw+0.08), y=1.65+row*2.4, parts=svc.split(' — '), heading=parts[0]||svc, body=parts[1]||'';
-      s.addShape(pres.shapes.RECTANGLE, { x, y, w:cw-0.08, h:2.2, fill:{ color:C.white }, line:{ color:C.border, width:1 } });
-      s.addShape(pres.shapes.RECTANGLE, { x, y, w:0.06, h:2.2, fill:{ color:C.accent } });
-      s.addText(heading, { x:x+0.22, y:y+0.18, w:cw-0.5, h:0.4, fontSize:14, fontFace:F.head, color:C.dark });
-      if (body) s.addText(body, { x:x+0.22, y:y+0.62, w:cw-0.5, h:1.4, fontSize:11, fontFace:F.body, color:C.muted, lineSpacingMultiple:1.5 });
+  { const s=contentSlide({bg:C.cream}); addSectionHeader(s,'THE MODEL · SERVICES + CAPABILITIES'); addPageTitle(s,'Services & Capabilities');
+    const services=(d.model?.services||[]).slice(0,6),cols=3,cw=(W-0.8)/cols;
+    services.forEach((svc,i)=>{ const col=i%cols,row=Math.floor(i/cols),x=0.4+col*(cw+0.08),y=1.65+row*2.4,parts=svc.split(' — '),heading=parts[0]||svc,body=parts[1]||'';
+      s.addShape(pres.shapes.RECTANGLE,{x,y,w:cw-0.08,h:2.2,fill:{color:C.white},line:{color:C.border,width:1}});
+      s.addShape(pres.shapes.RECTANGLE,{x,y,w:0.06,h:2.2,fill:{color:C.accent}});
+      s.addText(heading,{x:x+0.22,y:y+0.18,w:cw-0.5,h:0.4,fontSize:14,fontFace:F.head,color:C.dark});
+      if(body)s.addText(body,{x:x+0.22,y:y+0.62,w:cw-0.5,h:1.4,fontSize:11,fontFace:F.body,color:C.muted,lineSpacingMultiple:1.5});
     });
   }
-  { const s = contentSlide(); addSectionHeader(s,'THE MODEL · HOW WE WORK TOGETHER'); addPageTitle(s,'How We Work Together');
-    const steps=(d.model?.engagement_steps||[]).slice(0,5), sw=(W-0.8)/steps.length;
-    steps.forEach((st,i) => {
-      const x=0.4+i*(sw+0.04), tc=i===2?C.cream:C.dark, tm=i===2?'D0C8C0':C.muted;
-      s.addShape(pres.shapes.RECTANGLE, { x, y:1.6, w:sw-0.04, h:5.0, fill:{ color:i===2?C.dark:C.cream }, line:{ color:C.border, width:1 } });
-      s.addText(st.num||String(i+1).padStart(2,'0'), { x:x+0.15, y:1.8,  w:sw-0.3, h:0.7, fontSize:28, fontFace:F.head, color:C.accent });
-      s.addText(st.title||'', { x:x+0.15, y:2.55, w:sw-0.3, h:0.5, fontSize:14, fontFace:F.head, color:tc, bold:false });
-      s.addText(st.desc||'',  { x:x+0.15, y:3.1,  w:sw-0.3, h:3.2, fontSize:11, fontFace:F.body, color:tm, lineSpacingMultiple:1.5, valign:'top' });
+  { const s=contentSlide(); addSectionHeader(s,'THE MODEL · HOW WE WORK TOGETHER'); addPageTitle(s,'How We Work Together');
+    const steps=(d.model?.engagement_steps||[]).slice(0,5),sw=(W-0.8)/steps.length;
+    steps.forEach((st,i)=>{ const x=0.4+i*(sw+0.04),tc=i===2?C.cream:C.dark,tm=i===2?'D0C8C0':C.muted;
+      s.addShape(pres.shapes.RECTANGLE,{x,y:1.6,w:sw-0.04,h:5.0,fill:{color:i===2?C.dark:C.cream},line:{color:C.border,width:1}});
+      s.addText(st.num||String(i+1).padStart(2,'0'),{x:x+0.15,y:1.8, w:sw-0.3,h:0.7,fontSize:28,fontFace:F.head,color:C.accent});
+      s.addText(st.title||'',{x:x+0.15,y:2.55,w:sw-0.3,h:0.5,fontSize:14,fontFace:F.head,color:tc,bold:false});
+      s.addText(st.desc||'', {x:x+0.15,y:3.1, w:sw-0.3,h:3.2,fontSize:11,fontFace:F.body,color:tm,lineSpacingMultiple:1.5,valign:'top'});
     });
   }
-  { const s = contentSlide({ bg:C.cream }); addSectionHeader(s,'THE MODEL · STRATEGIC GUARDRAILS'); addPageTitle(s,'Strategic Guardrails');
-    s.addText('The things we protect — in how we work and who we become.', { x:0.5, y:1.4, w:W-1, h:0.4, fontSize:14, fontFace:F.body, color:C.muted, italic:true });
-    const guards=(d.model?.guardrails||[]).slice(0,4), cw=(W-0.8)/2;
-    guards.forEach((g,i) => {
-      const col=i%2, row=Math.floor(i/2), x=0.4+col*(cw+0.1), y=1.9+row*2.6, parts=g.split('. '), head=parts[0]||g, body=parts.slice(1).join('. ');
-      s.addShape(pres.shapes.RECTANGLE, { x, y, w:cw-0.1, h:2.35, fill:{ color:C.white }, line:{ color:C.border, width:1 } });
-      s.addShape(pres.shapes.RECTANGLE, { x, y, w:cw-0.1, h:0.07, fill:{ color:C.accent } });
-      s.addText(head, { x:x+0.2, y:y+0.2,  w:cw-0.5, h:0.5, fontSize:14, fontFace:F.head, color:C.dark });
-      if (body) s.addText(body, { x:x+0.2, y:y+0.75, w:cw-0.5, h:1.4, fontSize:12, fontFace:F.body, color:C.muted, lineSpacingMultiple:1.5 });
+  { const s=contentSlide({bg:C.cream}); addSectionHeader(s,'THE MODEL · STRATEGIC GUARDRAILS'); addPageTitle(s,'Strategic Guardrails');
+    s.addText('The things we protect — in how we work and who we become.',{x:0.5,y:1.4,w:W-1,h:0.4,fontSize:14,fontFace:F.body,color:C.muted,italic:true});
+    const guards=(d.model?.guardrails||[]).slice(0,4),cw=(W-0.8)/2;
+    guards.forEach((g,i)=>{ const col=i%2,row=Math.floor(i/2),x=0.4+col*(cw+0.1),y=1.9+row*2.6,parts=g.split('. '),head=parts[0]||g,body=parts.slice(1).join('. ');
+      s.addShape(pres.shapes.RECTANGLE,{x,y,w:cw-0.1,h:2.35,fill:{color:C.white},line:{color:C.border,width:1}});
+      s.addShape(pres.shapes.RECTANGLE,{x,y,w:cw-0.1,h:0.07,fill:{color:C.accent}});
+      s.addText(head,{x:x+0.2,y:y+0.2, w:cw-0.5,h:0.5,fontSize:14,fontFace:F.head,color:C.dark});
+      if(body)s.addText(body,{x:x+0.2,y:y+0.75,w:cw-0.5,h:1.4,fontSize:12,fontFace:F.body,color:C.muted,lineSpacingMultiple:1.5});
     });
   }
 
-  { const s = pres.addSlide(); s.background = { color: C.dark };
-    s.addShape(pres.shapes.RECTANGLE, { x:0, y:0, w:0.32, h:H, fill:{ color: C.accent } });
-    s.addText("WHAT'S STILL OPEN", { x:0.6, y:0.8, w:10, h:0.4, fontSize:11, fontFace:F.body, color:C.accent, charSpacing:5 });
-    s.addText('Strong foundation.\nNothing finished.\nThat\'s the point — keep working it.', { x:0.6, y:1.4, w:8, h:2.2, fontSize:30, fontFace:F.head, color:C.cream, lineSpacingMultiple:1.35, valign:'top' });
-    s.addText('This is a working document.\nAll content subject to revision.', { x:0.6, y:5.5, w:8, h:0.9, fontSize:12, fontFace:F.body, color:C.cream, transparency:45, lineSpacingMultiple:1.6 });
-    s.addText(new Date().toLocaleDateString('en-US',{month:'long',year:'numeric'}).toUpperCase(), { x:0.6, y:6.5, w:6, h:0.4, fontSize:10, fontFace:F.body, color:C.accent, charSpacing:4 });
+  { const s=pres.addSlide(); s.background={color:C.dark};
+    s.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:0.32,h:H,fill:{color:C.accent}});
+    s.addText("WHAT'S STILL OPEN",{x:0.6,y:0.8,w:10,h:0.4,fontSize:11,fontFace:F.body,color:C.accent,charSpacing:5});
+    s.addText('Strong foundation.\nNothing finished.\nThat\'s the point — keep working it.',{x:0.6,y:1.4,w:8,h:2.2,fontSize:30,fontFace:F.head,color:C.cream,lineSpacingMultiple:1.35,valign:'top'});
+    s.addText('This is a working document.\nAll content subject to revision.',{x:0.6,y:5.5,w:8,h:0.9,fontSize:12,fontFace:F.body,color:C.cream,transparency:45,lineSpacingMultiple:1.6});
+    s.addText(new Date().toLocaleDateString('en-US',{month:'long',year:'numeric'}).toUpperCase(),{x:0.6,y:6.5,w:6,h:0.4,fontSize:10,fontFace:F.body,color:C.accent,charSpacing:4});
   }
 
   const base64 = await pres.write({ outputType: 'base64' });
@@ -847,10 +677,8 @@ async function buildPptx(d) {
 function sanitizeHex(hex) { if (!hex) return null; return hex.replace(/[^0-9A-Fa-f]/g,'').slice(0,6)||null; }
 
 function fireConfetti() {
-  const canvas=document.getElementById('confetti-canvas');
-  canvas.width=window.innerWidth; canvas.height=window.innerHeight;
-  const ctx=canvas.getContext('2d');
-  const colours=['#8A9E7B','#C4785A','#526148','#C4D4B8','#E8DDD0','#F7F3EE','#2C2C28'];
+  const canvas=document.getElementById('confetti-canvas'); canvas.width=window.innerWidth; canvas.height=window.innerHeight;
+  const ctx=canvas.getContext('2d'); const colours=['#8A9E7B','#C4785A','#526148','#C4D4B8','#E8DDD0','#F7F3EE','#2C2C28'];
   const pieces=Array.from({length:130},()=>({x:Math.random()*canvas.width,y:-10-Math.random()*140,w:6+Math.random()*8,h:4+Math.random()*5,colour:colours[Math.floor(Math.random()*colours.length)],rot:Math.random()*Math.PI*2,vx:(Math.random()-0.5)*3,vy:2+Math.random()*4,vr:(Math.random()-0.5)*0.2}));
   let frame=0;
   function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);pieces.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=0.06;p.rot+=p.vr;ctx.save();ctx.globalAlpha=Math.max(0,1-frame/85);ctx.translate(p.x,p.y);ctx.rotate(p.rot);ctx.fillStyle=p.colour;ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);ctx.restore();});frame++;if(frame<95)requestAnimationFrame(draw);else ctx.clearRect(0,0,canvas.width,canvas.height);}
@@ -870,8 +698,7 @@ async function sendWithText(text) {
 }
 
 function showResumeBanner(saved) {
-  const msgs=document.getElementById('messages');
-  const banner=document.createElement('div'); banner.className='resume-banner';
+  const msgs=document.getElementById('messages'); const banner=document.createElement('div'); banner.className='resume-banner';
   banner.innerHTML=`<div><strong>You left off in Phase ${saved.phase} · ${PHASES[saved.phase]?.name||''}.</strong> Pick up where you were?</div><button class="resume-btn" onclick="resumeSession()">Resume</button><button class="resume-discard" onclick="discardSession()">Start fresh</button>`;
   msgs.appendChild(banner); window._savedSession=saved;
 }
@@ -885,11 +712,7 @@ function resumeSession() {
     const text=typeof msg.content==='string'?msg.content:msg.content?.find?.(b=>b.type==='text')?.text||'';
     if(!text)return;
     if(msg.role==='user')addUserMessage(text);
-    else{
-      const{display,synthDisplay}=parseResponse(text);
-      addAgentMessage(display,synthDisplay,false);
-      if(text.includes('<READY_FOR_DECK/>'))deckShown=true;
-    }
+    else{ const{display,synthDisplay}=parseResponse(text); addAgentMessage(display,synthDisplay,false); if(text.includes('<READY_FOR_DECK/>'))deckShown=true; }
   });
   if(deckShown&&!document.getElementById('deck-card'))addDeckCard();
   scrollBottom();
@@ -897,16 +720,13 @@ function resumeSession() {
 
 function discardSession(){clearSession();document.querySelector('.resume-banner')?.remove();init();}
 
-function shouldSearch(text){
-  return /\b(like|similar to|compared to|competing with|competitor|vs\.?|rival|have you heard of|do you know)\b/i.test(text)||(/\b[A-Z][a-zA-Z]+(?: [A-Z][a-zA-Z]+)?\b/.test(text)&&text.length>20);
-}
+function shouldSearch(text){ return /\b(like|similar to|compared to|competing with|competitor|vs\.?|rival|have you heard of|do you know)\b/i.test(text)||(/\b[A-Z][a-zA-Z]+(?: [A-Z][a-zA-Z]+)?\b/.test(text)&&text.length>20); }
 
 async function searchForContext(text){
   try{
     const res=await fetch('/.netlify/functions/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,tools:[{type:'web_search_20250305',name:'web_search'}],system:'Research assistant. Search for any brand or company mentioned. Return a concise 3–4 sentence summary. Plain text only.',messages:[{role:'user',content:`Brand strategy context: "${text.slice(0,300)}"\n\nSearch for specific brands or companies mentioned and summarise.`}]})});
     if(!res.ok)return null;
-    const data=await res.json();
-    const result=data.content?.filter(b=>b.type==='text').map(b=>b.text).join('')||'';
+    const data=await res.json(); const result=data.content?.filter(b=>b.type==='text').map(b=>b.text).join('')||'';
     return result.length>40?result:null;
   }catch(e){return null;}
 }
@@ -953,6 +773,19 @@ function removeAttachment(i){state.attachments.splice(i,1);renderAttachmentStrip
 function attachmentSummaryText(){if(!state.attachments.length)return'';const imgs=state.attachments.filter(a=>a.type==='image').length;const other=state.attachments.filter(a=>a.type!=='image');const parts=[];if(imgs)parts.push(`${imgs} image${imgs>1?'s':''}`);other.forEach(a=>parts.push(a.name));return parts.length?` [+ ${parts.join(', ')}]`:'';}
 
 init();
+
+// iOS KEYBOARD — push input bar up when keyboard opens
+if (window.visualViewport) {
+  function onViewportChange() {
+    const wrap = document.querySelector('.input-wrap');
+    if (!wrap) return;
+    const offsetFromBottom = window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop;
+    wrap.style.bottom = Math.max(0, offsetFromBottom) + 'px';
+    setTimeout(() => window.scrollTo({ top: document.body.scrollHeight }), 50);
+  }
+  window.visualViewport.addEventListener('resize', onViewportChange);
+  window.visualViewport.addEventListener('scroll', onViewportChange);
+}
 </script>
 </body>
 </html>
