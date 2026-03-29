@@ -520,24 +520,10 @@ async function generateDeck() {
     prog.textContent = 'Sending to Sam…';
 
     const brandName = state.brandName || 'New client';
-    const transcript = state.history.filter(m => typeof m.content === 'string').map(m => `[${m.role === 'assistant' ? 'SAM' : 'CLIENT'}]: ${m.content}`).join('\n\n');
-
-    let deckScript = '';
-    try {
-      const scriptRes = await fetch('/.netlify/functions/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514', max_tokens: 2000,
-          system: 'You are a brand strategist writing up a complete brand strategy document from a session transcript. Write in clear professional prose.',
-          messages: [{ role: 'user', content: `Write a complete brand strategy document from this session.\n\nTRANSCRIPT:\n${transcript}\n\nBRIEFS:\n${JSON.stringify(state.briefs, null, 2)}\n\nCover all phases. Flag anything skipped or needing follow-up.` }]
-        })
-      });
-      const scriptData = await scriptRes.json();
-      deckScript = scriptData.content?.map(b => b.text || '').join('') || '';
-    } catch(e) { deckScript = transcript; }
-
     const date = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+    // Use structured briefs directly — no extra API call, nothing to time out
+    const deckScript = JSON.stringify(state.briefs, null, 2);
 
     await fetch('/.netlify/functions/chat', {
       method: 'POST',
@@ -546,7 +532,7 @@ async function generateDeck() {
         from: 'Bloom <onboarding@resend.dev>',
         to: ['sbellisf@gmail.com'],
         subject: `Brand strategy session — ${brandName} · ${date}`,
-        html: `<p style="font-family:sans-serif;font-size:14px;color:#2C2C28;"><strong>${brandName}</strong> just completed their brand strategy session.<br><br>Deck attached. Notes below.<br><br><hr style="border:none;border-top:1px solid #DDD8D0;margin:16px 0;"><pre style="font-family:sans-serif;font-size:13px;color:#3A3A36;white-space:pre-wrap;line-height:1.7;">${deckScript}</pre><hr style="border:none;border-top:1px solid #DDD8D0;margin:16px 0;"><span style="font-size:11px;color:#7A776F;">Bloom · Brand Strategy Agent · KYD Studios</span></p>`,
+        html: `<p style="font-family:sans-serif;font-size:14px;color:#2C2C28;"><strong>${brandName}</strong> just completed their brand strategy session.<br><br>Deck attached. Structured briefs below.<br><br><hr style="border:none;border-top:1px solid #DDD8D0;margin:16px 0;"><pre style="font-family:monospace;font-size:12px;color:#3A3A36;white-space:pre-wrap;line-height:1.7;">${deckScript}</pre><hr style="border:none;border-top:1px solid #DDD8D0;margin:16px 0;"><span style="font-size:11px;color:#7A776F;">Bloom · Brand Strategy Agent · KYD Studios</span></p>`,
         attachments: [{ filename: fileName, content: base64 }]
       }})
     });
@@ -560,8 +546,6 @@ async function generateDeck() {
 }
 
 async function buildSlideContent(briefSummary) {
-  // Two smaller calls to avoid Netlify function timeout
-
   const res1 = await fetch('/.netlify/functions/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
