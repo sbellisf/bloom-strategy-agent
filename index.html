@@ -560,18 +560,39 @@ async function generateDeck() {
 }
 
 async function buildSlideContent(briefSummary) {
-  const res = await fetch('/.netlify/functions/chat', {
+  // Two smaller calls to avoid Netlify function timeout
+
+  const res1 = await fetch('/.netlify/functions/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514', max_tokens: 4000,
-      system: 'You are a brand strategy deck writer. Return ONLY valid JSON — no markdown, no backticks.',
-      messages: [{ role: 'user', content: `Write structured slide content from these briefs.\n\nBRIEFS:\n${briefSummary}\n\nReturn this exact JSON:\n{\n  "brand_name": "",\n  "tagline": "",\n  "cover_subtitle": "",\n  "context": { "why_exists": "", "market_problem": "", "core_belief": "" },\n  "positioning": { "statement": "", "elevator_pitch": "", "five_words": "", "core_term": "" },\n  "audience": {\n    "archetype_1": { "name": "", "role": "", "context": "", "tension": "", "trigger": "" },\n    "archetype_2": { "name": "", "role": "", "context": "", "tension": "", "trigger": "" },\n    "archetype_3": { "name": "", "role": "", "context": "", "tension": "", "trigger": "" },\n    "not_for": ["", "", ""]\n  },\n  "brand_core": {\n    "purpose": "", "mission": "", "vision": "",\n    "values": [{ "name": "", "description": "" }, { "name": "", "description": "" }, { "name": "", "description": "" }, { "name": "", "description": "" }],\n    "personality_traits": ["", "", "", "", ""],\n    "voice_description": ""\n  },\n  "differentiation": {\n    "comparisons": [{ "them": "", "us": "" }, { "them": "", "us": "" }, { "them": "", "us": "" }, { "them": "", "us": "" }, { "them": "", "us": "" }],\n    "messaging": { "tagline": "", "brand_statement": "", "elevator": "", "proof_point": "" }\n  },\n  "visual": { "palette_description": "", "primary_color_hex": "", "secondary_color_hex": "", "accent_color_hex": "", "font_heading": "", "font_body": "", "mood_words": ["", "", "", ""] },\n  "model": {\n    "services": ["", "", "", "", "", ""],\n    "engagement_steps": [{ "num": "01", "title": "", "desc": "" }, { "num": "02", "title": "", "desc": "" }, { "num": "03", "title": "", "desc": "" }, { "num": "04", "title": "", "desc": "" }, { "num": "05", "title": "", "desc": "" }],\n    "guardrails": ["", "", "", ""]\n  }\n}` }]
+      model: 'claude-sonnet-4-20250514', max_tokens: 2000,
+      system: 'You are a brand strategy deck writer. Return ONLY valid JSON — no markdown, no backticks, no explanation.',
+      messages: [{ role: 'user', content: `From these briefs return ONLY this JSON. Be concise — 1-2 sentences per field max.\n\nBRIEFS:\n${briefSummary}\n\n{"brand_name":"","tagline":"","context":{"why_exists":"","market_problem":"","core_belief":""},"positioning":{"statement":"","elevator_pitch":"","five_words":"","core_term":""},"audience":{"archetype_1":{"name":"","role":"","context":"","tension":"","trigger":""},"archetype_2":{"name":"","role":"","context":"","tension":"","trigger":""},"archetype_3":{"name":"","role":"","context":"","tension":"","trigger":""},"not_for":["",""]},"brand_core":{"purpose":"","mission":"","vision":"","values":[{"name":"","description":""},{"name":"","description":""},{"name":"","description":""},{"name":"","description":""}],"personality_traits":["","","",""],"voice_description":""}}` }]
     })
   });
-  const data = await res.json();
-  const raw = data.content?.map(b => b.text || '').join('') || '{}';
-  try { return JSON.parse(raw.replace(/```json|```/g, '').trim()); } catch(e) { throw new Error('Could not parse slide content'); }
+  const data1 = await res1.json();
+  const raw1 = data1.content?.map(b => b.text || '').join('') || '{}';
+  let part1;
+  try { part1 = JSON.parse(raw1.replace(/```json|```/g, '').trim()); }
+  catch(e) { throw new Error('Could not parse slide content'); }
+
+  const res2 = await fetch('/.netlify/functions/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514', max_tokens: 2000,
+      system: 'You are a brand strategy deck writer. Return ONLY valid JSON — no markdown, no backticks, no explanation.',
+      messages: [{ role: 'user', content: `From these briefs return ONLY this JSON. Be concise — 1-2 sentences per field max.\n\nBRIEFS:\n${briefSummary}\n\n{"differentiation":{"comparisons":[{"them":"","us":""},{"them":"","us":""},{"them":"","us":""}],"messaging":{"tagline":"","brand_statement":"","elevator":"","proof_point":""}},"visual":{"palette_description":"","primary_color_hex":"","secondary_color_hex":"","accent_color_hex":"","font_heading":"","font_body":"","mood_words":["","",""]},"model":{"services":["","","",""],"engagement_steps":[{"num":"01","title":"","desc":""},{"num":"02","title":"","desc":""},{"num":"03","title":"","desc":""},{"num":"04","title":"","desc":""},{"num":"05","title":"","desc":""}],"guardrails":["","",""]}}` }]
+    })
+  });
+  const data2 = await res2.json();
+  const raw2 = data2.content?.map(b => b.text || '').join('') || '{}';
+  let part2;
+  try { part2 = JSON.parse(raw2.replace(/```json|```/g, '').trim()); }
+  catch(e) { throw new Error('Could not parse slide content'); }
+
+  return { ...part1, ...part2 };
 }
 
 async function buildPptx(d) {
