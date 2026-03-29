@@ -256,8 +256,24 @@
 
   @media (max-width: 640px) {
     .phase-track { display: none; }
-    .chat-wrap { padding: 20px 14px 160px; }
-    .bubble { max-width: 90%; }
+    .chat-wrap { padding: 16px 12px 170px; }
+    .bubble { max-width: 92%; padding: 11px 14px; font-size: 13px; }
+    .avatar { width: 28px; height: 28px; font-size: 12px; }
+    .msg { gap: 8px; }
+    header { padding: 10px 14px; }
+    .logo-name { font-size: 15px; }
+    .logo-sub { display: none; }
+    .logo-divider { display: none; }
+    .input-wrap { padding: 10px 12px 16px; }
+    .input-inner { gap: 7px; }
+    .input-field { font-size: 16px; padding: 10px 13px; min-height: 44px; }
+    .btn-send, .btn-mic, .btn-attach { width: 44px; height: 44px; font-size: 16px; }
+    .btn-skip { padding: 0 11px; font-size: 12px; height: 44px; }
+    .deck-card { padding: 20px; }
+    .deck-card h3 { font-size: 18px; }
+    .resume-banner { flex-direction: column; align-items: flex-start; gap: 10px; padding: 12px 14px; }
+    .phase-chip { font-size: 9px; padding: 2px 8px; }
+    .synthesis-card { padding: 10px 12px; }
   }
 </style>
 </head>
@@ -302,7 +318,6 @@
 
 <script>
 const STORAGE_KEY = 'bloom_session_v1';
-
 const state = { phase: 0, history: [], briefs: {}, brandName: '', generating: false, attachments: [] };
 
 function saveSession() {
@@ -346,12 +361,12 @@ SKIP LOGIC:
 
 PHASES:
 0. Intake — High-level discovery ONLY. Cover: (1) what the business does, (2) the origin story — how and why it started, (3) who they compete with — 3–5 competitors by name, (4) what genuinely frustrates them about their industry, (5) one quick question: do they already have a name, or is naming something they need help with? Just note the answer — don't explore it here. Do NOT ask about target audience or customer psychographics — that belongs in Phase 2. As soon as you have those things, synthesise and move on.
-1. Positioning — The core problem they solve, their unique take on it, a draft positioning statement, a core term they could own
+1. Positioning — The core problem they solve, their unique take on it, a draft positioning statement, a tagline (short phrase — 2-6 words), a core term they could own
 2. Audience — 3 audience archetypes. An archetype is a psychographic profile — a type of person defined by mindset, values, fears and desires. NOT a job title. Give each a vivid human name (e.g. 'The Burned Founder'). Describe them emotionally. Also: who you're NOT for.
 3. Brand Core — Purpose, mission, vision, 4–5 values, personality, tone of voice. Sam drafts these herself — she does NOT ask the client to write them. She proposes, client reacts and adjusts.
 4. Naming — If they already have a name: acknowledge it, pressure-test it against the Brand Core in 2-3 exchanges, flag any concerns, move on. If they need a name: work through naming criteria, naming territory (descriptive, invented, metaphorical, founder-led), and propose 3-5 name directions with rationale. Sam leads — she proposes, client reacts.
 5. Differentiation — Elevator pitch (2 sentences), 3 us vs. them contrasts, messaging hierarchy
-6. Visual Direction — 3 feeling words, brand references they admire, typography personality. NEVER invent colours or fonts.
+6. Visual Direction — 3 feeling words, brand references they admire (capture exact brand names mentioned), typography personality. NEVER invent colours. For fonts: always recommend real Google Fonts — a specific heading typeface and body typeface by name. Choose from: Cormorant Garamond, Playfair Display, Fraunces, DM Serif Display (serif headings) / DM Sans, Inter, Outfit, Nunito (sans body). Pick the pairing that fits the mood.
 7. The Model — What they sell, how clients engage, hard guardrails, what success looks like in 12 months
 
 BEHAVIOR RULES:
@@ -568,7 +583,7 @@ async function buildSlideContent(briefSummary) {
     body: JSON.stringify({
       model: 'claude-sonnet-4-20250514', max_tokens: 2000,
       system: 'You are a brand strategy deck writer. Return ONLY valid JSON — no markdown, no backticks, no explanation.',
-      messages: [{ role: 'user', content: `From these briefs return ONLY this JSON. Be concise — 1-2 sentences per field max.\n\nBRIEFS:\n${briefSummary}\n\n{"differentiation":{"comparisons":[{"them":"","us":""},{"them":"","us":""},{"them":"","us":""}],"messaging":{"tagline":"","brand_statement":"","elevator":"","proof_point":""}},"visual":{"palette_description":"","primary_color_hex":"","secondary_color_hex":"","accent_color_hex":"","font_heading":"","font_body":"","mood_words":["","",""]},"model":{"services":["","","",""],"engagement_steps":[{"num":"01","title":"","desc":""},{"num":"02","title":"","desc":""},{"num":"03","title":"","desc":""},{"num":"04","title":"","desc":""},{"num":"05","title":"","desc":""}],"guardrails":["","",""]}}` }]
+      messages: [{ role: 'user', content: `From these briefs return ONLY this JSON. Be concise — 1-2 sentences per field max.\n\nBRIEFS:\n${briefSummary}\n\n{"differentiation":{"comparisons":[{"them":"","us":""},{"them":"","us":""},{"them":"","us":""}],"messaging":{"tagline":"","brand_statement":"","elevator":"","proof_point":""}},"visual":{"palette_description":"","primary_color_hex":"","secondary_color_hex":"","accent_color_hex":"","font_heading":"","font_body":"","mood_words":["","",""],"brand_references":["","",""]},"model":{"services":["","","",""],"engagement_steps":[{"num":"01","title":"","desc":""},{"num":"02","title":"","desc":""},{"num":"03","title":"","desc":""},{"num":"04","title":"","desc":""},{"num":"05","title":"","desc":""}],"guardrails":["","",""]}}` }]
     })
   });
   const data2 = await res2.json();
@@ -676,7 +691,7 @@ async function buildPptx(d) {
       s.addShape(pres.shapes.RECTANGLE, { x, y:1.55, w:cw, h:5.4, fill:{ color:i===1?C.dark:C.cream }, line:{ color:C.border, width:1 } });
       s.addShape(pres.shapes.RECTANGLE, { x, y:1.55, w:cw, h:0.07, fill:{ color:C.accent } });
       s.addText((a.name||'').toUpperCase(), { x:x+0.16, y:1.72, w:cw-0.3, h:0.35, fontSize:11, fontFace:F.head, color:C.accent, charSpacing:2 });
-      s.addText(a.role||'',    { x:x+0.16, y:2.05, w:cw-0.3, h:0.35, fontSize:9,  fontFace:F.body, color:tm, charSpacing:2 });
+      s.addText(a.role||'',    { x:x+0.16, y:2.05, w:cw-0.3, h:0.35, fontSize:9,  fontFace:F.body, color:tm });
       s.addText('CONTEXT',     { x:x+0.16, y:2.5,  w:cw-0.3, h:0.25, fontSize:8,  fontFace:F.body, color:C.accent, charSpacing:3 });
       s.addText(a.context||'', { x:x+0.16, y:2.72, w:cw-0.3, h:1.0,  fontSize:11, fontFace:F.body, color:tc, lineSpacingMultiple:1.4 });
       s.addText('TENSION',     { x:x+0.16, y:3.82, w:cw-0.3, h:0.25, fontSize:8,  fontFace:F.body, color:C.accent, charSpacing:3 });
@@ -711,7 +726,7 @@ async function buildPptx(d) {
     values.forEach((v,i) => {
       const col=i%2, row=Math.floor(i/2), x=0.4+col*(cw+0.1), y=1.65+row*2.55;
       s.addShape(pres.shapes.RECTANGLE, { x, y, w:cw-0.1, h:2.35, fill:{ color:C.white }, line:{ color:C.border, width:1 } });
-      s.addShape(pres.shapes.RECTANGLE, { x, y, w:0.06,   h:2.35, fill:{ color:C.accent } });
+      s.addShape(pres.shapes.RECTANGLE, { x, y, w:0.06, h:2.35, fill:{ color:C.accent } });
       s.addText(v.name||'',        { x:x+0.22, y:y+0.2,  w:cw-0.5, h:0.4, fontSize:16, fontFace:F.head, color:C.dark, bold:false });
       s.addText(v.description||'', { x:x+0.22, y:y+0.65, w:cw-0.5, h:1.5, fontSize:12, fontFace:F.body, color:C.muted, lineSpacingMultiple:1.5 });
     });
@@ -762,18 +777,26 @@ async function buildPptx(d) {
       s.addText('#'+sw.color,{ x, y:3.28, w:1.5, h:0.25, fontSize:9, fontFace:F.body, color:C.muted, align:'center', transparency:30 });
     });
     s.addText(d.visual?.palette_description||'', { x:0.5, y:3.65, w:7, h:0.9, fontSize:13, fontFace:F.body, color:C.dark, lineSpacingMultiple:1.5 });
+
     s.addText('TYPOGRAPHY', { x:7.8, y:1.6, w:5, h:0.28, fontSize:10, fontFace:F.body, color:C.muted, charSpacing:4 });
-    s.addShape(pres.shapes.RECTANGLE, { x:7.8, y:1.95, w:5.0, h:1.4, fill:{ color:C.white }, line:{ color:C.border, width:1 } });
-    s.addText('Heading', { x:8.0, y:2.0,  w:4.5, h:0.35, fontSize:11, fontFace:F.body, color:C.muted });
-    s.addText(F.head,    { x:8.0, y:2.3,  w:4.5, h:0.55, fontSize:22, fontFace:F.head, color:C.dark });
-    s.addText('Body',    { x:8.0, y:2.85, w:4.5, h:0.25, fontSize:11, fontFace:F.body, color:C.muted });
-    s.addText(F.body,    { x:8.0, y:3.06, w:4.5, h:0.4,  fontSize:16, fontFace:F.body, color:C.dark });
-    s.addText('MOOD', { x:7.8, y:3.65, w:5, h:0.28, fontSize:10, fontFace:F.body, color:C.muted, charSpacing:4 });
+    s.addShape(pres.shapes.RECTANGLE, { x:7.8, y:1.95, w:5.0, h:1.5, fill:{ color:C.white }, line:{ color:C.border, width:1 } });
+    s.addText('HEADING', { x:8.0, y:2.05, w:4.5, h:0.25, fontSize:9, fontFace:F.body, color:C.muted, charSpacing:3 });
+    s.addText(d.visual?.font_heading || 'Cormorant Garamond', { x:8.0, y:2.28, w:4.5, h:0.45, fontSize:20, fontFace:F.head, color:C.dark });
+    s.addText('BODY', { x:8.0, y:2.78, w:4.5, h:0.25, fontSize:9, fontFace:F.body, color:C.muted, charSpacing:3 });
+    s.addText(d.visual?.font_body || 'DM Sans', { x:8.0, y:3.01, w:4.5, h:0.35, fontSize:15, fontFace:F.body, color:C.dark });
+
+    s.addText('MOOD', { x:7.8, y:3.6, w:5, h:0.28, fontSize:10, fontFace:F.body, color:C.muted, charSpacing:4 });
     mood.forEach((m,i) => {
-      const x=7.8+(i%2)*2.55, y=4.0+Math.floor(i/2)*0.55;
+      const x=7.8+(i%2)*2.55, y=3.95+Math.floor(i/2)*0.52;
       s.addShape(pres.shapes.RECTANGLE, { x, y, w:2.35, h:0.38, fill:{ color:C.dark } });
       s.addText(m, { x, y, w:2.35, h:0.38, fontSize:12, fontFace:F.head, color:C.cream, align:'center', valign:'middle', italic:true });
     });
+
+    const refs=(d.visual?.brand_references||[]).filter(Boolean);
+    if (refs.length) {
+      s.addText('BRAND REFERENCES', { x:0.5, y:4.7, w:7, h:0.28, fontSize:10, fontFace:F.body, color:C.muted, charSpacing:4 });
+      s.addText(refs.join('  ·  '), { x:0.5, y:5.0, w:12.3, h:0.5, fontSize:14, fontFace:F.head, color:C.dark, italic:true });
+    }
   }
 
   sectionSlide('07','The Model');
@@ -782,7 +805,7 @@ async function buildPptx(d) {
     services.forEach((svc,i) => {
       const col=i%cols, row=Math.floor(i/cols), x=0.4+col*(cw+0.08), y=1.65+row*2.4, parts=svc.split(' — '), heading=parts[0]||svc, body=parts[1]||'';
       s.addShape(pres.shapes.RECTANGLE, { x, y, w:cw-0.08, h:2.2, fill:{ color:C.white }, line:{ color:C.border, width:1 } });
-      s.addShape(pres.shapes.RECTANGLE, { x, y, w:0.06,    h:2.2, fill:{ color:C.accent } });
+      s.addShape(pres.shapes.RECTANGLE, { x, y, w:0.06, h:2.2, fill:{ color:C.accent } });
       s.addText(heading, { x:x+0.22, y:y+0.18, w:cw-0.5, h:0.4, fontSize:14, fontFace:F.head, color:C.dark });
       if (body) s.addText(body, { x:x+0.22, y:y+0.62, w:cw-0.5, h:1.4, fontSize:11, fontFace:F.body, color:C.muted, lineSpacingMultiple:1.5 });
     });
