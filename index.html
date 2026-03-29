@@ -343,7 +343,7 @@ SKIP LOGIC:
 - At the end of each phase synthesis, list any skipped questions.
 
 PHASES:
-0. Intake — What the business does, their story, who they're competing with (3–5 by name), what frustrates them about their industry
+0. Intake — High-level discovery ONLY. Cover these four things and nothing else: (1) what the business does, (2) the origin story — how and why it started, (3) who they compete with — 3–5 competitors by name, (4) what genuinely frustrates them about their industry. Do NOT ask about target audience, customer psychographics, who their people are, or what their customers feel — that all belongs in Phase 2. As soon as you have those four things, synthesise and move on.
 1. Positioning — The core problem they solve, their unique take, a draft positioning statement, a core term they could own
 2. Audience — 3 audience archetypes (psychographic profiles, not job titles). Give each a vivid human name. Also: who you're NOT for.
 3. Brand Core — Purpose, mission, vision, 4–5 values, personality, tone of voice. Sam drafts these herself — she does NOT ask the client to write them.
@@ -528,7 +528,7 @@ async function generateDeck() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514', max_tokens: 1000,
+          model: 'claude-sonnet-4-20250514', max_tokens: 2000,
           system: 'You are a brand strategist writing up a complete brand strategy document from a session transcript. Write in clear professional prose.',
           messages: [{ role: 'user', content: `Write a complete brand strategy document from this session.\n\nTRANSCRIPT:\n${transcript}\n\nBRIEFS:\n${JSON.stringify(state.briefs, null, 2)}\n\nCover all phases. Flag anything skipped or needing follow-up.` }]
         })
@@ -539,7 +539,6 @@ async function generateDeck() {
 
     const date = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-    // Send email via Netlify function — key never exposed in client code
     await fetch('/.netlify/functions/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -565,7 +564,7 @@ async function buildSlideContent(briefSummary) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514', max_tokens: 1000,
+      model: 'claude-sonnet-4-20250514', max_tokens: 4000,
       system: 'You are a brand strategy deck writer. Return ONLY valid JSON — no markdown, no backticks.',
       messages: [{ role: 'user', content: `Write structured slide content from these briefs.\n\nBRIEFS:\n${briefSummary}\n\nReturn this exact JSON:\n{\n  "brand_name": "",\n  "tagline": "",\n  "cover_subtitle": "",\n  "context": { "why_exists": "", "market_problem": "", "core_belief": "" },\n  "positioning": { "statement": "", "elevator_pitch": "", "five_words": "", "core_term": "" },\n  "audience": {\n    "archetype_1": { "name": "", "role": "", "context": "", "tension": "", "trigger": "" },\n    "archetype_2": { "name": "", "role": "", "context": "", "tension": "", "trigger": "" },\n    "archetype_3": { "name": "", "role": "", "context": "", "tension": "", "trigger": "" },\n    "not_for": ["", "", ""]\n  },\n  "brand_core": {\n    "purpose": "", "mission": "", "vision": "",\n    "values": [{ "name": "", "description": "" }, { "name": "", "description": "" }, { "name": "", "description": "" }, { "name": "", "description": "" }],\n    "personality_traits": ["", "", "", "", ""],\n    "voice_description": ""\n  },\n  "differentiation": {\n    "comparisons": [{ "them": "", "us": "" }, { "them": "", "us": "" }, { "them": "", "us": "" }, { "them": "", "us": "" }, { "them": "", "us": "" }],\n    "messaging": { "tagline": "", "brand_statement": "", "elevator": "", "proof_point": "" }\n  },\n  "visual": { "palette_description": "", "primary_color_hex": "", "secondary_color_hex": "", "accent_color_hex": "", "font_heading": "", "font_body": "", "mood_words": ["", "", "", ""] },\n  "model": {\n    "services": ["", "", "", "", "", ""],\n    "engagement_steps": [{ "num": "01", "title": "", "desc": "" }, { "num": "02", "title": "", "desc": "" }, { "num": "03", "title": "", "desc": "" }, { "num": "04", "title": "", "desc": "" }, { "num": "05", "title": "", "desc": "" }],\n    "guardrails": ["", "", "", ""]\n  }\n}` }]
     })
@@ -610,7 +609,6 @@ async function buildPptx(d) {
   function addSectionHeader(slide, label) { slide.addText(label, { x:0.5, y:0.25, w:5, h:0.35, fontSize:10, fontFace:F.body, color:C.muted, charSpacing:4, bold:false }); }
   function addPageTitle(slide, title, y)  { slide.addText(title, { x:0.5, y:y||0.65, w:W-1, h:0.75, fontSize:30, fontFace:F.head, color:C.dark, bold:false }); }
 
-  // Cover
   { const s = pres.addSlide(); s.background = { color: C.dark };
     s.addShape(pres.shapes.RECTANGLE, { x:0, y:0, w:0.32, h:H, fill:{ color: C.accent } });
     s.addText(d.brand_name || 'Your Brand', { x:0.7, y:1.8, w:10, h:1.5, fontSize:54, fontFace:F.head, color:C.cream, bold:false });
@@ -619,7 +617,6 @@ async function buildPptx(d) {
     s.addText('Working document — all content subject to revision.', { x:0.7, y:6.1, w:8, h:0.4, fontSize:10, fontFace:F.body, color:C.cream, transparency:50 });
   }
 
-  // TOC
   { const s = contentSlide(); addSectionHeader(s, 'CONTENTS'); addPageTitle(s, "What's Inside", 0.65);
     const sections = [['01','Context','Why we exist · What\'s broken'],['02','Positioning','The statement · The pitch · Core term'],['03','Audience','Archetypes · Psychographics · Who we\'re not for'],['04','Brand Core','Purpose · Mission · Vision · Values · Voice'],['05','Differentiation','Elevator pitch · Us vs. them · Messaging hierarchy'],['06','Visual Direction','Palette · Typography · Mood'],['07','The Model','Services · Engagement · Guardrails']];
     const colW = (W-1.2)/2;
@@ -806,7 +803,6 @@ async function buildPptx(d) {
     });
   }
 
-  // Final slide
   { const s = pres.addSlide(); s.background = { color: C.dark };
     s.addShape(pres.shapes.RECTANGLE, { x:0, y:0, w:0.32, h:H, fill:{ color: C.accent } });
     s.addText("WHAT'S STILL OPEN", { x:0.6, y:0.8, w:10, h:0.4, fontSize:11, fontFace:F.body, color:C.accent, charSpacing:5 });
