@@ -15,13 +15,27 @@ exports.handler = async function(event, context) {
 
   try {
     const body = JSON.parse(event.body);
-    const apiKey = process.env.ANTHROPIC_API_KEY;
 
+    // Handle Resend email sending
+    if (body.resend) {
+      const resendRes = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+        },
+        body: JSON.stringify(body.resend),
+      });
+      const resendData = await resendRes.json();
+      return { statusCode: 200, headers, body: JSON.stringify(resendData) };
+    }
+
+    // Handle Anthropic API calls
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': apiKey,
+        'x-api-key': process.env.ANTHROPIC_API_KEY,
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify(body),
