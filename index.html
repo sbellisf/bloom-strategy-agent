@@ -109,20 +109,20 @@
   .resume-discard { background: none; border: none; color: var(--muted); font-size: 12px; cursor: pointer; text-decoration: underline; flex-shrink: 0; }
 
   @media (max-width: 640px) {
-    html, body { height: 100%; min-height: -webkit-fill-available; }
-    body { min-height: 100svh; }
+    html, body { height: 100%; height: 100dvh; }
+    body { display: flex; flex-direction: column; overflow: hidden; }
     .phase-track { display: none; }
-    .chat-wrap { padding: 16px 12px 160px; min-height: 0; }
-    .messages { padding-bottom: 0; }
+    .chat-wrap { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 16px 12px 16px; min-height: 0; }
+    .messages { padding-bottom: 8px; }
     .bubble { max-width: 92%; padding: 11px 14px; font-size: 13px; }
     .avatar { width: 28px; height: 28px; font-size: 12px; }
     .msg { gap: 8px; }
-    header { padding: 10px 14px; }
+    header { padding: 10px 14px; flex-shrink: 0; }
     .logo-name { font-size: 15px; }
     .logo-sub { display: none; }
     .logo-divider { display: none; }
-    .input-wrap { padding: 8px 12px max(20px, env(safe-area-inset-bottom)); background: rgba(247,243,238,0.98); border-top: 1px solid var(--border); }
-    .input-inner { gap: 6px; align-items: center; }
+    .input-wrap { position: relative; bottom: auto; left: auto; right: auto; padding: 8px 12px max(12px, env(safe-area-inset-bottom)); background: var(--cream); border-top: 1px solid var(--border); flex-shrink: 0; }
+    .input-inner { gap: 6px; align-items: center; margin: 0; max-width: 100%; }
     .input-field { font-size: 16px; padding: 10px 16px; min-height: 44px; max-height: 120px; border-radius: 22px; background: var(--white); }
     .btn-send { width: 40px; height: 40px; font-size: 17px; border-radius: 50%; flex-shrink: 0; }
     .btn-mic  { width: 40px; height: 40px; font-size: 17px; border-radius: 50%; flex-shrink: 0; }
@@ -168,7 +168,7 @@
   <div class="input-inner">
     <button class="btn-attach" onclick="document.getElementById('file-input').click()">📎</button>
     <input type="file" id="file-input" accept="image/*,audio/*,video/*,.pdf,.mp3,.mp4,.wav,.m4a" multiple style="display:none" onchange="handleFileAttach(this)">
-    <textarea class="input-field" id="input" placeholder="Type your answer here…" rows="1"></textarea>
+    <textarea class="input-field" id="input" placeholder="Type your answer…" rows="1"></textarea>
     <button class="btn-skip" id="skip-btn" onclick="skipQuestion()">Skip</button>
     <button class="btn-mic" id="mic-btn" onclick="toggleMic()">🎤</button>
     <button class="btn-send" id="send-btn" onclick="sendMessage()">↑</button>
@@ -357,7 +357,17 @@ function addDeckCard() {
   msgs.appendChild(wrap); scrollBottom();
 }
 
-function scrollBottom() { setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 60); }
+function scrollBottom() {
+  setTimeout(() => {
+    const chatWrap = document.querySelector('.chat-wrap');
+    if (chatWrap && window.innerWidth <= 640) {
+      chatWrap.scrollTop = chatWrap.scrollHeight;
+    } else {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+  }, 60);
+}
+
 function setInputDisabled(val) { document.getElementById('input').disabled = val; document.getElementById('send-btn').disabled = val; }
 
 async function sendMessage() {
@@ -762,7 +772,7 @@ function startMic(){
   recognition.onend=()=>{input.value=input.value.trim();stopMic();};
   recognition.start();
 }
-function stopMic(){isRecording=false;document.getElementById('mic-btn').classList.remove('recording');document.getElementById('input').placeholder='Type your answer here…';if(recognition){recognition.stop();recognition=null;}}
+function stopMic(){isRecording=false;document.getElementById('mic-btn').classList.remove('recording');document.getElementById('input').placeholder='Type your answer…';if(recognition){recognition.stop();recognition=null;}}
 
 function getFileIcon(t){if(t.startsWith('image/'))return'🖼️';if(t.startsWith('audio/'))return'🎵';if(t.startsWith('video/'))return'🎬';if(t==='application/pdf')return'📄';return'📎';}
 function handleFileAttach(input){Array.from(input.files).forEach(file=>{const reader=new FileReader();reader.onload=(e)=>{const[,data]=e.target.result.split(',');const isImage=file.type.startsWith('image/');state.attachments.push({name:file.name,fileType:file.type,mediaType:file.type,type:isImage?'image':'other',data:isImage?data:null,preview:isImage?e.target.result:null});renderAttachmentStrip();};reader.readAsDataURL(file);});input.value='';}
