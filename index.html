@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
 <title>Brand Strategy Agent</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
@@ -11,7 +11,7 @@
     --ink: #1A1A17; --charcoal: #2C2C28; --muted: #7A776F; --border: #DDD8D0;
     --cream: #F7F3EE; --warm: #E8DDD0; --white: #FDFCFA; --sage: #8A9E7B;
     --sage-light: #C4D4B8; --sage-pale: #EEF3EA; --sage-dark: #526148;
-    --terra: #C4785A; --terra-light: #F2E4DC; --agent: #2C2C28; --user-bg: #EEF3EA;
+    --terra: #C4785A; --terra-light: #F2E4DC;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--charcoal); min-height: 100vh; display: flex; flex-direction: column; }
@@ -166,7 +166,7 @@
 <div class="input-wrap">
   <div class="attachment-strip" id="attachment-strip"></div>
   <div class="input-inner">
-    <button class="btn-attach" onclick="document.getElementById('file-input').click()" title="Attach file">📎</button>
+    <button class="btn-attach" onclick="document.getElementById('file-input').click()">📎</button>
     <input type="file" id="file-input" accept="image/*,audio/*,video/*,.pdf,.mp3,.mp4,.wav,.m4a" multiple style="display:none" onchange="handleFileAttach(this)">
     <textarea class="input-field" id="input" placeholder="Type your answer here…" rows="1"></textarea>
     <button class="btn-skip" id="skip-btn" onclick="skipQuestion()">Skip</button>
@@ -477,7 +477,6 @@ async function buildPptx(d) {
   function addSectionHeader(s, label) { s.addText(label, { x:0.5, y:0.25, w:5, h:0.35, fontSize:10, fontFace:F.body, color:C.muted, charSpacing:4, bold:false }); }
   function addPageTitle(s, title, y)  { s.addText(title, { x:0.5, y:y||0.65, w:W-1, h:0.75, fontSize:30, fontFace:F.head, color:C.dark, bold:false }); }
 
-  // COVER
   { const s = pres.addSlide(); s.background = { color: C.dark };
     s.addShape(pres.shapes.RECTANGLE, { x:0, y:0, w:0.32, h:H, fill:{ color: C.accent } });
     s.addText(d.brand_name || 'Your Brand', { x:0.7, y:1.8, w:10, h:1.5, fontSize:54, fontFace:F.head, color:C.cream, bold:false });
@@ -486,7 +485,6 @@ async function buildPptx(d) {
     s.addText('Working document — all content subject to revision.', { x:0.7, y:6.1, w:8, h:0.4, fontSize:10, fontFace:F.body, color:C.cream, transparency:50 });
   }
 
-  // TOC
   { const s = contentSlide(); addSectionHeader(s,'CONTENTS'); addPageTitle(s,"What's Inside",0.65);
     const sections=[['01','Context','Why we exist · What\'s broken'],['02','Positioning','The statement · The pitch · Core term'],['03','Audience','Archetypes · Psychographics · Who we\'re not for'],['04','Brand Core','Purpose · Mission · Vision · Values · Voice'],['05','Differentiation','Elevator pitch · Us vs. them · Messaging hierarchy'],['06','Visual Direction','Palette · Typography · Mood'],['07','The Model','Services · Engagement · Guardrails']];
     const colW=(W-1.2)/2;
@@ -563,7 +561,7 @@ async function buildPptx(d) {
       s.addShape(pres.shapes.RECTANGLE,{x:0.5,y,w:0.06,h:1.5,fill:{color:C.accent}});
       s.addText(item.label,{x:0.72,y:y+0.05,w:3,h:0.28,fontSize:10,fontFace:F.body,color:C.accent,charSpacing:4});
       s.addText(item.sub,  {x:0.72,y:y+0.33,w:5,h:0.25,fontSize:10,fontFace:F.body,color:C.muted});
-      s.addText(item.text, {x:0.72,y:y+0.6, w:W-1.4,h:1.0,fontSize:14,fontFace:F.body,color:C.dark,lineSpacingMultiple:1.5});
+      s.addText(item.text, {x:0.72,y:y+0.6,w:W-1.4,h:1.0,fontSize:14,fontFace:F.body,color:C.dark,lineSpacingMultiple:1.5});
     });
   }
   { const s=contentSlide({bg:C.cream}); addSectionHeader(s,'BRAND CORE · VALUES'); addPageTitle(s,'The Values That Drive Every Decision');
@@ -595,7 +593,7 @@ async function buildPptx(d) {
       s.addShape(pres.shapes.RECTANGLE,{x:6.9,y,w:6.0,h:0.82,fill:{color:C.dark}});
       s.addShape(pres.shapes.RECTANGLE,{x:6.4,y:y+0.18,w:0.5,h:0.46,fill:{color:C.accent}});
       s.addText(c.them||'',{x:0.65,y,w:6.1,h:0.82,fontSize:12,fontFace:F.body,color:C.muted,valign:'middle'});
-      s.addText(c.us||'',  {x:7.1, y,w:5.6,h:0.82,fontSize:12,fontFace:F.body,color:C.cream,valign:'middle'});
+      s.addText(c.us||'', {x:7.1, y,w:5.6,h:0.82,fontSize:12,fontFace:F.body,color:C.cream,valign:'middle'});
     });
   }
   { const s=contentSlide(); addSectionHeader(s,'DIFFERENTIATION · MESSAGING HIERARCHY'); addPageTitle(s,'What to Say, When');
@@ -773,19 +771,6 @@ function removeAttachment(i){state.attachments.splice(i,1);renderAttachmentStrip
 function attachmentSummaryText(){if(!state.attachments.length)return'';const imgs=state.attachments.filter(a=>a.type==='image').length;const other=state.attachments.filter(a=>a.type!=='image');const parts=[];if(imgs)parts.push(`${imgs} image${imgs>1?'s':''}`);other.forEach(a=>parts.push(a.name));return parts.length?` [+ ${parts.join(', ')}]`:'';}
 
 init();
-
-// iOS KEYBOARD — push input bar up when keyboard opens
-if (window.visualViewport) {
-  function onViewportChange() {
-    const wrap = document.querySelector('.input-wrap');
-    if (!wrap) return;
-    const offsetFromBottom = window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop;
-    wrap.style.bottom = Math.max(0, offsetFromBottom) + 'px';
-    setTimeout(() => window.scrollTo({ top: document.body.scrollHeight }), 50);
-  }
-  window.visualViewport.addEventListener('resize', onViewportChange);
-  window.visualViewport.addEventListener('scroll', onViewportChange);
-}
 </script>
 </body>
 </html>
