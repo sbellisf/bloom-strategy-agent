@@ -271,6 +271,17 @@ const PHASES = [
   { id:6, name:'The Model',       label:'Phase 6 · The Model' },
 ];
 
+// Phase-specific fallback transitions — used only if Claude returns empty text.
+// Each key is the phase we just ARRIVED at (after synthesis advanced us).
+const PHASE_FALLBACKS = {
+  1: "Good — I've got a clear picture of your brand and the landscape. Now let's figure out where you actually sit in it. What's the core problem you solve for your clients — in plain language?",
+  2: "Positioning is locked. Now I need to understand who you're really built for. Think about your best client — the one who gets it immediately. What are they like as a person?",
+  3: "I've got a sharp read on your audience. Now comes Brand Core — purpose, mission, values, voice. I'm going to draft these for you based on everything so far. First question: when your brand is doing exactly what it should, what changes in someone's life?",
+  4: "Brand core is solid. Now let's sharpen how you talk about all of this. If you had two sentences to explain what you do and why someone should care — what would you say?",
+  5: "Messaging is dialled in. Let's talk visual direction. Not specific colors or fonts yet — just feeling. Give me three words that describe how your brand should *feel* when someone encounters it.",
+  6: "Visual direction captured. Last phase — the model. How does someone actually work with you? Walk me through what happens from first conversation to ongoing engagement."
+};
+
 function buildSystemPrompt() {
   return `You are Sam — a senior brand strategist. You're running a structured brand strategy session with a founder. You're warm, direct, and genuinely curious. No corporate speak, no jargon. One sharp question at a time. You listen, build on what's said, and move on when you have what you need.
 
@@ -312,6 +323,9 @@ BEHAVIOR RULES:
 - On phase transition, output: <SYNTHESIS phase="N">...json...</SYNTHESIS>
 - At the end of Phase 6, output: <READY_FOR_DECK/>
 
+CRITICAL — OUTPUT ORDER FOR PHASE TRANSITIONS:
+When completing a phase, ALWAYS write your visible response FIRST (recap, transition, first question for the new phase), THEN place the <SYNTHESIS> tag LAST. The client never sees the SYNTHESIS tag — it is invisible metadata. If the SYNTHESIS tag comes first and the response gets cut off, the client sees nothing. Visible text first, synthesis tag last. Every time.
+
 SYNTHESIS JSON FORMAT:
 { "phase": 0, "name": "Intake", "skipped": [], "data": {} }
 
@@ -339,7 +353,7 @@ async function callClaude(userMessage, searchContext) {
   const res = await fetch('/.netlify/functions/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'x-api-key': getApiKey(), 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-    body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, system: buildSystemPrompt(), messages: state.history })
+    body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 2000, system: buildSystemPrompt(), messages: state.history })
   });
   if (!res.ok) throw new Error(`API error ${res.status}`);
   const data = await res.json();
@@ -365,11 +379,10 @@ function parseResponse(raw) {
     const advancedTo = parseInt(synthMatches[synthMatches.length - 1][1]) + 1;
     if (advancedTo <= 6 && advancedTo > state.phase) { state.phase = advancedTo; updatePhasePills(); }
   }
-  // Guard: if display is empty after stripping synthesis tags, use a fallback
+  // If display is empty after stripping tags, use a phase-specific fallback
   if (!display || !display.trim()) {
-    display = synthDisplay
-      ? `Got it — wrapping up Phase ${synthDisplay.phase}. Let me move us forward.`
-      : "Got it — let's keep going. What would you like to work on next?";
+    display = PHASE_FALLBACKS[state.phase] || "Got it — I've captured that. Let me take us into the next section.";
+    console.log('[Bloom] Empty response — used phase ' + state.phase + ' fallback');
   }
   return { display, synthDisplay, deckReady };
 }
@@ -513,10 +526,8 @@ async function buildPptx(d) {
   function aSH(s,l){s.addText(l,{x:0.5,y:0.25,w:5,h:0.35,fontSize:10,fontFace:F.body,color:C.muted,charSpacing:4,bold:false});}
   function aPT(s,t,y){s.addText(t,{x:0.5,y:y||0.65,w:W-1,h:0.75,fontSize:30,fontFace:F.head,color:C.dark,bold:false});}
 
-  // Cover
   {const s=pres.addSlide();s.background={color:C.dark};s.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:0.32,h:H,fill:{color:C.accent}});s.addText(d.brand_name||'Your Brand',{x:0.7,y:1.8,w:10,h:1.5,fontSize:54,fontFace:F.head,color:C.cream,bold:false});if(d.tagline)s.addText(d.tagline,{x:0.7,y:3.4,w:9,h:0.6,fontSize:18,fontFace:F.head,color:C.cream,italic:true,transparency:20});s.addText('BRAND STRATEGY  ·  '+new Date().toLocaleDateString('en-US',{month:'long',year:'numeric'}).toUpperCase(),{x:0.7,y:5.5,w:10,h:0.4,fontSize:10,fontFace:F.body,color:C.accent,charSpacing:4});s.addText('Working document — all content subject to revision.',{x:0.7,y:6.1,w:8,h:0.4,fontSize:10,fontFace:F.body,color:C.cream,transparency:50});}
 
-  // TOC
   {const s=cS();aSH(s,'CONTENTS');aPT(s,"What's Inside",0.65);const sections=[['01','Context',"Why we exist · What's broken"],['02','Positioning','The statement · The pitch · Core term'],['03','Audience',"Archetypes · Psychographics · Who we're not for"],['04','Brand Core','Purpose · Mission · Vision · Values · Voice'],['05','Differentiation','Elevator pitch · Us vs. them · Messaging hierarchy'],['06','Visual Direction','Palette · Typography · Mood'],['07','The Model','Services · Engagement · Guardrails']];const colW=(W-1.2)/2;sections.forEach((sec,i)=>{const col=i<4?0:1,row=i<4?i:i-4,x=0.5+col*(colW+0.2),y=1.7+row*1.1;s.addShape(pres.shapes.RECTANGLE,{x,y,w:colW,h:0.95,fill:{color:C.cream},line:{color:C.border,width:1}});s.addText(sec[0],{x:x+0.14,y:y+0.12,w:0.6,h:0.35,fontSize:11,fontFace:F.head,color:C.accent,bold:false});s.addText(sec[1],{x:x+0.14,y:y+0.34,w:colW-0.3,h:0.3,fontSize:14,fontFace:F.head,color:C.dark,bold:false});s.addText(sec[2],{x:x+0.14,y:y+0.6,w:colW-0.3,h:0.28,fontSize:10,fontFace:F.body,color:C.muted});});}
 
   sS('01','Context');
@@ -580,7 +591,7 @@ async function sendWithText(text) {
 function showResumeBanner(saved) {
   const msgs=document.getElementById('messages'); const banner=document.createElement('div'); banner.className='resume-banner';
   const phaseName=PHASES[saved.phase]?.name||'previous session';
-  banner.innerHTML=`<div><strong>You left off in Phase ${saved.phase} · ${phaseName}.</strong> Pick up where you were?</div><button class="resume-btn" onclick="resumeSession()">Resume</button><button class="resume-discard" onclick="discardSession()">Start fresh</button>`;
+  banner.innerHTML='<div><strong>You left off in Phase '+saved.phase+' · '+phaseName+'.</strong> Pick up where you were?</div><button class="resume-btn" onclick="resumeSession()">Resume</button><button class="resume-discard" onclick="discardSession()">Start fresh</button>';
   msgs.appendChild(banner); window._savedSession=saved;
 }
 
@@ -605,7 +616,7 @@ function shouldSearch(text){
 
 async function searchForContext(text){
   try{
-    const res=await fetch('/.netlify/functions/chat',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':getApiKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,tools:[{type:'web_search_20250305',name:'web_search'}],system:'Research assistant. Search for any brand, company, or industry mentioned. Return a concise 3–4 sentence factual summary. Plain text only.',messages:[{role:'user',content:`Brand strategy session context: "${text.slice(0,300)}"\n\nSearch for specific brands or companies mentioned and summarise.`}]})});
+    const res=await fetch('/.netlify/functions/chat',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':getApiKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,tools:[{type:'web_search_20250305',name:'web_search'}],system:'Research assistant. Search for any brand, company, or industry mentioned. Return a concise 3–4 sentence factual summary. Plain text only.',messages:[{role:'user',content:'Brand strategy session context: "'+text.slice(0,300)+'"\n\nSearch for specific brands or companies mentioned and summarise.'}]})});
     if(!res.ok)return null;
     const data=await res.json();const result=data.content?.filter(b=>b.type==='text').map(b=>b.text).join('')||'';
     return result.length>40?result:null;
@@ -617,16 +628,16 @@ function hideSearchIndicator(){document.getElementById('search-ind')?.remove();}
 
 const YOUR_EMAIL = 'sbellisf@gmail.com';
 function sendSummaryEmail(brandName, briefSummary) {
-  const subject = encodeURIComponent(`Brand strategy session — ${brandName}`);
+  const subject = encodeURIComponent('Brand strategy session — ' + brandName);
   const body = encodeURIComponent(briefSummary);
-  window.open(`mailto:${YOUR_EMAIL}?subject=${subject}&body=${body}`);
+  window.open('mailto:' + YOUR_EMAIL + '?subject=' + subject + '&body=' + body);
 }
 
 function getFileIcon(t){if(t.startsWith('image/'))return'🖼️';if(t.startsWith('audio/'))return'🎵';if(t.startsWith('video/'))return'🎬';if(t==='application/pdf')return'📄';return'📎';}
 function handleFileAttach(input){Array.from(input.files).forEach(file=>{const reader=new FileReader();reader.onload=(e)=>{const[,data]=e.target.result.split(',');const isImage=file.type.startsWith('image/');state.attachments.push({name:file.name,fileType:file.type,mediaType:file.type,type:isImage?'image':'other',data:isImage?data:null,preview:isImage?e.target.result:null});renderAttachmentStrip();};reader.readAsDataURL(file);});input.value='';}
-function renderAttachmentStrip(){const strip=document.getElementById('attachment-strip');strip.innerHTML='';if(!state.attachments.length){strip.classList.remove('has-files');return;}strip.classList.add('has-files');state.attachments.forEach((a,i)=>{const chip=document.createElement('div');chip.className='attachment-chip';const prev=a.preview?`<img src="${a.preview}" class="chip-img-preview">`:`<span class="chip-icon">${getFileIcon(a.fileType)}</span>`;chip.innerHTML=`${prev}<span class="chip-name">${a.name}</span><button class="chip-remove" onclick="removeAttachment(${i})">×</button>`;strip.appendChild(chip);});}
+function renderAttachmentStrip(){const strip=document.getElementById('attachment-strip');strip.innerHTML='';if(!state.attachments.length){strip.classList.remove('has-files');return;}strip.classList.add('has-files');state.attachments.forEach((a,i)=>{const chip=document.createElement('div');chip.className='attachment-chip';const prev=a.preview?'<img src="'+a.preview+'" class="chip-img-preview">':'<span class="chip-icon">'+getFileIcon(a.fileType)+'</span>';chip.innerHTML=prev+'<span class="chip-name">'+a.name+'</span><button class="chip-remove" onclick="removeAttachment('+i+')">×</button>';strip.appendChild(chip);});}
 function removeAttachment(i){state.attachments.splice(i,1);renderAttachmentStrip();}
-function attachmentSummaryText(){if(!state.attachments.length)return'';const imgs=state.attachments.filter(a=>a.type==='image').length;const other=state.attachments.filter(a=>a.type!=='image');const parts=[];if(imgs)parts.push(`${imgs} image${imgs>1?'s':''}`);other.forEach(a=>parts.push(a.name));return parts.length?` [+ ${parts.join(', ')}]`:'';}
+function attachmentSummaryText(){if(!state.attachments.length)return'';const imgs=state.attachments.filter(a=>a.type==='image').length;const other=state.attachments.filter(a=>a.type!=='image');const parts=[];if(imgs)parts.push(imgs+' image'+(imgs>1?'s':''));other.forEach(a=>parts.push(a.name));return parts.length?' [+ '+parts.join(', ')+']':'';}
 
 async function init() { if (!checkApiKey()) return; startSession(); }
 
@@ -648,10 +659,10 @@ function startMic(){
   if(!SR){alert('Voice input isn\'t supported in this browser. Try Chrome.');return;}
   recognition=new SR();recognition.continuous=true;recognition.interimResults=true;recognition.lang='en-US';
   const input=document.getElementById('input'),btn=document.getElementById('mic-btn');let finalTranscript=input.value;
-  recognition.onstart=()=>{isRecording=true;btn.classList.add('recording');if(!finalTranscript)input.placeholder='Listening…';};
-  recognition.onresult=(e)=>{let interim='';for(let i=e.resultIndex;i<e.results.length;i++){const t=e.results[i][0].transcript;if(e.results[i].isFinal)finalTranscript+=t+' ';else interim=t;}input.value=finalTranscript+interim;input.style.height='auto';input.style.height=Math.min(input.scrollHeight,140)+'px';};
-  recognition.onerror=(e)=>{if(e.error!=='no-speech')stopMic();};
-  recognition.onend=()=>{input.value=input.value.trim();stopMic();};
+  recognition.onstart=function(){isRecording=true;btn.classList.add('recording');if(!finalTranscript)input.placeholder='Listening…';};
+  recognition.onresult=function(e){let interim='';for(let i=e.resultIndex;i<e.results.length;i++){const t=e.results[i][0].transcript;if(e.results[i].isFinal)finalTranscript+=t+' ';else interim=t;}input.value=finalTranscript+interim;input.style.height='auto';input.style.height=Math.min(input.scrollHeight,140)+'px';};
+  recognition.onerror=function(e){if(e.error!=='no-speech')stopMic();};
+  recognition.onend=function(){input.value=input.value.trim();stopMic();};
   recognition.start();
 }
 function stopMic(){isRecording=false;document.getElementById('mic-btn').classList.remove('recording');document.getElementById('input').placeholder='Type your answer here…';if(recognition){recognition.stop();recognition=null;}}
