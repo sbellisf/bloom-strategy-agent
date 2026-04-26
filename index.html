@@ -304,6 +304,13 @@ SKIP LOGIC:
 - At the end of each phase synthesis, list any skipped questions.
 - Never force someone to answer something they're stuck on.
 
+HANDLING VAGUE OR META REPLIES:
+If the user types something that isn't an answer to your question — like "you tell me", "what's next?", "idk", "you go", "I don't know", "resume", "continue", or any other meta-prompt — DO NOT repeat your previous question verbatim. Instead, do ONE of these in order of preference:
+1. Re-ask your question with a concrete example or alternate angle ("Let me try that another way...")
+2. Offer 2-3 specific options for them to pick from
+3. Make a defensible assumption and ask them to confirm or adjust
+NEVER respond with a generic "Got it — let's keep going. What would you like to work on next?" That's a useless turn. Always advance the conversation with substance.
+
 WEB SEARCH:
 When [SEARCH RESULT] blocks appear, use that data to ask sharper questions.
 
@@ -413,6 +420,18 @@ function hideTyping() { document.getElementById('typing-indicator')?.remove(); }
 
 function addAgentMessage(text, synthDisplay, deckReady) {
   const msgs = document.getElementById('messages');
+  // Dedup: if Claude returned the exact same text as the previous agent turn (a known failure mode
+  // when the user types vague non-answers like "you tell me"), swap in a recovery message instead.
+  const allAgents = msgs.querySelectorAll('.msg.agent .bubble');
+  const lastAgent = allAgents[allAgents.length - 1];
+  if (lastAgent && text && !synthDisplay && !deckReady) {
+    const prevText = (lastAgent.textContent || '').replace(/^\s*✦\s*[A-Z0-9·\s]+/, '').trim();
+    const newText = (text || '').trim();
+    if (prevText && newText && prevText === newText) {
+      console.log('[Bloom] Caught duplicate agent message — using recovery prompt');
+      text = "Let me try this another way. " + (PHASE_FALLBACKS[state.phase] || "Tell me what's coming up for you on this — even half-formed thoughts are useful.");
+    }
+  }
   const wrap = document.createElement('div'); wrap.className = 'msg agent';
   const phase = PHASES[state.phase];
   let inner = `
