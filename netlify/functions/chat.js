@@ -8,7 +8,7 @@ const ALLOWED_ORIGINS = [
   // 'https://bloom.kydstudios.io',
 ];
 
-const MODEL = 'claude-sonnet-4-20250514';   // server-enforced, client cannot override
+const MODEL = 'claude-sonnet-5';   // server-enforced, client cannot override
 const MAX_TOKENS_CAP = 2000;                // server-enforced upper bound
 const ALLOWED_TOOLS = new Set(['web_search_20250305']);
 
